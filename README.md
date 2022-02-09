@@ -2,6 +2,8 @@
 
 This code is a template to create new plugins for [ePiframe](https://github.com/MikeGawi/ePiframe) photo frame.
 
+Check [the list](#plugins-list) of available plugins!
+
 # What is it?
 
 The base plugin class exposes methods to add new functions to photo frame or even to the Raspberry Pi itself as ePiframe runs it's own auto recovering service, Flask based website with jQuery and Bootstrap 5 and can trigger system functions. The plugin provides basic frame helper modules, access to backend and customizable configuration class that has validation, conversion, dependencies, value/type verification and more.
@@ -20,7 +22,7 @@ But also methods to extend not-strictly photo related functions:
 
 # How to start?
 
-Check the detailed documentation with examples and tutorial and have fun!
+Check the detailed [documentation](https://github.com/MikeGawi/ePiframe.plugin/blob/master/docs/SETUP.md) with examples and tutorial and have fun!
 
 # Contribution
 
