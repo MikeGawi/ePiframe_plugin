@@ -1,4 +1,4 @@
-<h1>ePiframe.plugin Documentation</h1>
+<h1>ePiframe-plugin Documentation</h1>
 
 # Table of Contents
 <!--ts-->
@@ -44,7 +44,7 @@ Please follow these rules if you want to create your own plugin:
 
 # Get started
 
-* Start a new project with GitHub [*ePiframe.plugin*](https://github.com/MikeGawi/ePiframe.plugin) project template and change the _<plugin_name>_ folder name to the name of the plugin - ePiframe will use this name to recognize the plugin module
+* Start a new project with GitHub [*ePiframe-plugin*](https://github.com/MikeGawi/ePiframe-plugin) project template and change the _<plugin_name>_ folder name to the name of the plugin - ePiframe will use this name to recognize the plugin module
 * Inside ```_plugin.py``` file fill in the basic data like name, description, author, etc.
 * Start overriding methods that the plugin will use, use built-in modules or create new ones and have fun with it!
 * Create plugin configuration file
@@ -69,7 +69,7 @@ Most of the basic ePiframe modules that can be useful for particular plugins met
     └── _plugin.py
 ```
 
-*plugin_name* is the main directory of the plugin and it should be changed to the actual plugin name.
+*plugin_name* is the main directory of the plugin and it should be changed to the actual plugin name. Dot characters ('.') are prohibited in the *plugin_name* due to Python module recognition!
 
 |File|Description|
 |----|-----------|
@@ -611,6 +611,8 @@ Examples:
 			
 	## End of configmgr class.
 ```
+
+__*NOTE:*__ To access main plugin class inside ```configmgr``` body use ```self.main_class```
 
 ## Configuration file
 

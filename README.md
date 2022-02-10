@@ -22,7 +22,7 @@ But also methods to extend not-strictly photo related functions:
 
 # How to start?
 
-Check the detailed [documentation](https://github.com/MikeGawi/ePiframe.plugin/blob/master/docs/SETUP.md) with examples and tutorial and have fun!
+Check the detailed [documentation](https://github.com/MikeGawi/ePiframe-plugin/blob/master/docs/SETUP.md) with examples and tutorial and have fun!
 
 # Contribution
 
