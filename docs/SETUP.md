@@ -59,6 +59,8 @@ The scope starts in the root folder of ePiframe so if some module needs to be us
 
 Most of the basic ePiframe modules that can be useful for particular plugins methods are passed during the run but all needed ePiframe ingredients can be imported if needed.
 
+If exception occurs during the run of overridden method (that stops the next steps of the plugin) an exception should be raised to be catched by the main script to be properly reported in logs.
+
 ## Files
 
 ```
@@ -303,11 +305,15 @@ def postprocess_photo (self, finalphoto, width, height, is_horizontal, convertmg
 	#add text to converted photo:
 	from PIL import Image, ImageDraw, ImageFont, ImageColor
 	image = Image.open(finalphoto)
+	#rotating image if frame not in horizontal position
+	if not is_horizontal: image = image.transpose(Image.ROTATE_90 if self.globalconfig.getint('rotation') == 90 else Image.ROTATE_270)
 	draw = ImageDraw.Draw(image)
 	font = ImageFont.truetype(os.path.join(self.path, 'static/fonts/NotoSans-SemiCondensed.ttf'), 20) #path holds the absolute path to the plugin folder
 	stroke = ImageColor.getcolor('Black', image.mode) #mind the color mode of the image
 	fill = ImageColor.getcolor('White', image.mode)
 	draw.text((1, 100), 'text', font = font, stroke_width = 2, stroke_fill = stroke, fill = fill)
+	#rotating back if in vertical position
+	if not is_horizontal: image = image.transpose(Image.ROTATE_270 if self.globalconfig.getint('rotation') == 90 else Image.ROTATE_90)
 	image.save(finalphoto)
 ```
 
@@ -556,11 +562,11 @@ Possible ```misc.configprop``` properties and methods passed in constructor:
 |```special```|```None```|Structure to check more complicated property dependencies. More on that below|
 |```length```|```None```|Property length check, e.g. list should have this number of elements. Should be used together with ```delimiter```|
 |```delimiter```|```None```|Delimiter for list type properties, used to split values. Should be used together with ```length```|
-|```possible```|```None```|List of possible values that property should be in|
+|```possible```|```None```|List of possible values that property should be in. This will also check values so ```checkfunction``` is not necesarry|
 |```resetneeded```|```None```|Flag to display "Reset needed after changing this property" alert in WebUI. Used to service related properties|
 |```convert```|```None```|Method to convert value property to another value. More on that below|
 
-```dependency``` is a structure that can be defined in two ways: by the name of the property that should enable child property (e.g. ```"dependency='is_function_enabled'"``` - that will check if boolean of ```is_function_enabled``` value is ```True``` and enable dependent property) or a name of the parent entry and the check function for more complicated checks, e.g. ```dependency=['display_type', displaymanager.get_spi()]```, the value of property ```'display_type'``` will be passed to ```displaymanager.get_spi()``` method and should return ```True``` if the value is right, only then the children entries will be enabled as well.
+```dependency``` is a structure that can be defined in two ways: by the name of the property that should enable child property (e.g. ```"dependency='is_function_enabled'"``` - that will check if boolean of ```is_function_enabled``` value is ```True``` and enable dependent property) or a name of the parent entry and the value for more complicated checks, e.g. ```dependency=['display_type', displaymanager.get_spi()]``` (or ```dependency=['size', 90]```), the value of property ```'display_type'``` will compared to ```displaymanager.get_spi()``` method result and will return ```True``` if the value is right, only then the children entries will be enabled as well.
 
 ```special``` is defined as a method that gets two variables: check function and the list of properties that are dependent with each other, e.g. ```special=configprop.special(filteringmanager.verify_times, ['photos_from', 'photos_to'])```. The check function gets the list of properties values and should return ```True``` if the dependencies are met, e.g. check the start time and end time, end time shouldn't be before start time, so check function checks both values for that.
 
@@ -596,7 +602,7 @@ Examples:
 				#configprop('ip_with_check_and_bool_dependency', self, dependency='use_web', checkfunction=connection.is_ip),
 				#configprop('delimited_list_of_integers', self, delimiter=',', prop_type=configprop.INTLIST_TYPE),
 				#configprop('delimited_list_of_strings_with_mult_values_special_check_and_length', self, delimiter=',', prop_type=configprop.STRINGLIST_TYPE, length=7, special=check(verifyfunc, ['1st_entry', '2nd_entry'])),
-				#configprop('value_based_dependency', self, minvalue=0, prop_type=configprop.INTEGER_TYPE, dependency=['config_entry_value_to_check', value_or_function_that_returns_value_to_get_true]),			
+				#configprop('value_based_dependency', self, minvalue=0, prop_type=configprop.INTEGER_TYPE, dependency=['config_entry_value_to_check', value_or_function_that_returns_value]),			
 				#configprop('path', self, prop_type=configprop.FILE_TYPE),
 				#configprop('string_with_convert_function_good_for_converting_old_config_values_to_new_version', self, convert=convert_function),
 				## ...
@@ -670,7 +676,7 @@ But there are some basic steps typical for the ePiframe infrastructure that are 
 
 # Examples
 
-* Stock Information
+* [Cryptocurrency Information](https://github.com/MikeGawi/Cryptocurrency-ePiframe)
 * Frames and Quotes
 * Photo Filters
 
