@@ -15,7 +15,7 @@ With these methods plugin can extend ALL ePiframe photo functions:
 * Postprocess converted (for the display size and type) photo before sending to frame, e.g. add text, re-convert, etc.
 
 But also methods to extend not-strictly photo related functions:
-* Extend API functions, e.g. adding REST API,return data by query/website like get hardware statistics, expose API for smart home server, etc.
+* Extend API functions, e.g. adding REST API, return data by query/website like get hardware statistics, expose API for smart home server, etc.
 * Add WebUI new website, e.g. add a server controlling site, with optional link in the WebUI menu and ePiframe templating.
 * Add new action buttons in WebUI Tools section of ePiframe, e.g. control device, trigger system action, control smart devices, etc.
 * Add new thread to ePiframe service, e.g. frequently gathering data, scheduled triggers, etc.
@@ -37,4 +37,5 @@ Please follow these rules if you want to create your own plugin:
 
 |Plugin name and URL|Author|Desription|
 |-------------------|------|----------|
-| | | |
+|[cryptocurrency-ePiframe](https://github.com/MikeGawi/cryptocurrency-ePiframe)|[MikeGawi](https://github.com/MikeGawi)|Displays cryptocurrency price and percentage change on frame|
+||||

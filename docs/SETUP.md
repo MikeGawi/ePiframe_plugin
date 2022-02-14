@@ -44,12 +44,12 @@ Please follow these rules if you want to create your own plugin:
 
 # Get started
 
-* Start a new project with GitHub [*ePiframe-plugin*](https://github.com/MikeGawi/ePiframe-plugin) project template and change the _<plugin_name>_ folder name to the name of the plugin - ePiframe will use this name to recognize the plugin module
+* Start a new project with GitHub [*ePiframe-plugin*](https://github.com/MikeGawi/ePiframe-plugin) project template and give it a name (no dots!) that will be the name of the plugin - ePiframe will use this name to recognize the plugin module
 * Inside ```_plugin.py``` file fill in the basic data like name, description, author, etc.
 * Start overriding methods that the plugin will use, use built-in modules or create new ones and have fun with it!
 * Create plugin configuration file
 * Test the plugin with ePiframe and put everything to the new GitHub project if all good
-* Add plugin details in the table and create a pull request - it will appear on the main site
+* Add plugin details in [the table](https://github.com/MikeGawi/ePiframe-plugin) and create a pull request - it will appear on the main site
 
 # Structure
 
@@ -64,11 +64,13 @@ If exception occurs during the run of overridden method (that stops the next ste
 ## Files
 
 ```
-└── plugin_name
-    ├── config.cfg
-    ├── default
-    │   └── config.default
-    └── _plugin.py
+<ePiframe root path>
+└──plugins
+   └── plugin_name
+	   ├── config.cfg
+	   ├── default
+	   │   └── config.default
+	   └── _plugin.py
 ```
 
 *plugin_name* is the main directory of the plugin and it should be changed to the actual plugin name. Dot characters ('.') are prohibited in the *plugin_name* due to Python module recognition!
@@ -261,8 +263,6 @@ __*NOTE:*__ It's good to reset the records indexing after sorting with ```photom
 	|Variable|Description|
 	|--------|-----------|
 	|```orgphoto```|the source/target photo path with name and extension|
-	|```width```|photo width in pixels|
-	|```height```|photo height in pixels|
 	|```is_horizontal```|boolean, indicates wheter frame is in horizontal position|
 * **Returns:**  _nothing_. This method should save modified photo as ```orgphoto``` name passed to it
 * **Current functionality of ePiframe:** there is no photo preprocessing
@@ -270,14 +270,19 @@ __*NOTE:*__ It's good to reset the records indexing after sorting with ```photom
 Example:
 
 ```
-def preprocess_photo (self, orgphoto, width, height, is_horizontal, convertmgr):
+def preprocess_photo (self, orgphoto, is_horizontal, convertmgr):
 	#add graphic element from file to the photo:
 	from PIL import Image
 	image = Image.open(orgphoto)
+	width, height = image.size #get image size if needed
 	element = Image.open(element_path)
 	image.paste(element, (1, 100))
 	image.save(orgphoto)
 ```
+
+__*NOTE:*__ It is possible to get image size directly from file with ```err, width, height = convertmanager().get_image_size(self.globalconfig.get('convert_bin_path'), orgphoto, constants.FIRST_FRAME_GIF)```
+
+**_❗ IMPORTANT ❗_** Image processing operations (especially processing of huge, high quality photos) are very resources consuming so keep in mind that ePiframe usually works on Raspberry Pi Zero.
 
 References: 
 * [ePiframe Weather Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/weathermanager.py)
@@ -663,6 +668,10 @@ is_enabled=1
 References:
 * [ePiframe config.cfg file](https://github.com/MikeGawi/ePiframe/blob/master/config.cfg)
 
+__*NOTE:*__ After updating/changing default configuration file with new entries, the new ones, that doesn't exists in *config.cfg* file, will be moved there with default values.
+
+__*NOTE:*__ Script will handle moving entries from one section to another as entries are recognized by name not the section and name.
+
 # Plugin installation
 
 According to the [contribution statements](#contribution), plugin should precisely describe:
@@ -676,7 +685,7 @@ But there are some basic steps typical for the ePiframe infrastructure that are 
 
 # Examples
 
-* [Cryptocurrency Information](https://github.com/MikeGawi/Cryptocurrency-ePiframe)
+* [Cryptocurrency Information](https://github.com/MikeGawi/cryptocurrency-ePiframe)
 * Frames and Quotes
 * Photo Filters
 
