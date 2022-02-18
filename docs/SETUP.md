@@ -686,9 +686,9 @@ But there are some basic steps typical for the ePiframe infrastructure that are 
 # Examples
 
 * [Cryptocurrency Information](https://github.com/MikeGawi/cryptocurrency-ePiframe)
-* Frames and Quotes
-* Photo Filters
+* [Frames and Quotes](https://github.com/MikeGawi/decor-ePiframe)
+* [Photo Filters](https://github.com/MikeGawi/cartoon-ePiframe)
 
 # Tutorial
 
-Small tutorial that gathers all steps needed to implement a plugin with different functionalities.
+Small [tutorial](https://github.com/MikeGawi/ePiframe-plugin/blob/master/docs/TUTORIAL.md) that gathers all steps needed to implement a plugin with different functionalities.
