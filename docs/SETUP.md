@@ -24,6 +24,7 @@
       * [Configuration file](#configuration-file)
    * [Plugin installation](#plugin-installation)
    * [Examples](#examples)
+   * [License](#license)
    * [Tutorial](#tutorial)
 <!--te-->
 
@@ -34,7 +35,7 @@ Please follow these rules if you want to create your own plugin:
 * Add a short, one sentence, clear description what it does and put this data in the plugin class as well
 * What external API's/sites/modules/projects it uses and if they have limitations or price
 * Include a detailed installation instruction, what needs to be installed and configured
-* Add plugin details in this table and create a pull request- it will appear on this site
+* Add plugin details in [this table](https://github.com/MikeGawi/ePiframe-plugin#plugins-list) and create a pull request
 
 ## Additional hints
 
@@ -166,6 +167,8 @@ def add_photo_source (self, idlabel, creationlabel, sourcelabel, photomgr):
 References: 
 * [ePiframe Local Source Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/localsourcemanager.py)
 
+__*NOTE:*__ ```self.SOURCE``` is required to be set in this method as it will identify this photo source!
+
 __*NOTE:*__ Creation time must be in _YYYY-mm-ddTHH:MM:SSZ_, i.e. 2021-01-27T22:59:37Z format!
 
 ### Adding new photo source file retrieving method
@@ -186,7 +189,7 @@ __*NOTE:*__ Creation time must be in _YYYY-mm-ddTHH:MM:SSZ_, i.e. 2021-01-27T22:
 * **Returns:** photo final filename, best if it would contain an extension
 * **Current functionality of ePiframe:** downloading selected photo from Google Photos and/or copying from local storage
 
-This method is optional and if not overriden, the standard copy from photo id (as a source location) to filename method will be used, extension will be added automatically.
+This method is optional and if not overriden, the standard copy from photo id (as a source location) to filename method will be used, extension will be added automatically. Alos, it will be executed only if the photo that has been picked up is from the source collected in ```add_photo_source``` method and identified by ```self.SOURCE``` value.
 
 Examples:
 
@@ -209,11 +212,11 @@ def add_photo_source_get_file (self, photo, path, filename, idlabel, creationlab
 def add_photo_source_get_file (self, photo, path, filename, idlabel, creationlabel, sourcelabel, photomgr):
 	#this source gets photo MIME type (can be converted to extension name with constants) and download URL so create a filename and download the file:
 	#The MIME type and URL column should be populated in the previous source collecting method !
-	#filename_ret = filename + "." + constants.TYPE_TO_EXTENSION[photo['MIMETYPE_HEADER']]
-	#downloadUrl = photo['URL']
-	#connection.download_file(downloadUrl, path, filename_ret, constants.OK_STATUS_ERRORCODE, constants.CHECK_CONNECTION_TIMEOUT)
+	filename_ret = filename + "." + constants.TYPE_TO_EXTENSION[photo['MIMETYPE_HEADER']]
+	downloadUrl = photo['URL']
+	connection.download_file(downloadUrl, path, filename_ret, constants.OK_STATUS_ERRORCODE, constants.CHECK_CONNECTION_TIMEOUT)
 	#... timeout, connection error handling, etc.
-	#return filename_ret
+	return filename_ret
 ```
 
 References: 
@@ -264,13 +267,18 @@ __*NOTE:*__ It's good to reset the records indexing after sorting with ```photom
 	|--------|-----------|
 	|```orgphoto```|the source/target photo path with name and extension|
 	|```is_horizontal```|boolean, indicates wheter frame is in horizontal position|
+	|```photo```|a Pandas element photo representation with all possible columns and ```idlabel``` as identifier|
+	|```idlabel```|photo ID label name|
+	|```creationlabel```|photo creation time label name|
+	|```sourcelabel```|photo source label name|
+* **Returns:** photo final filename, best if it would contain an extension
 * **Returns:**  _nothing_. This method should save modified photo as ```orgphoto``` name passed to it
 * **Current functionality of ePiframe:** there is no photo preprocessing
 
 Example:
 
 ```
-def preprocess_photo (self, orgphoto, is_horizontal, convertmgr):
+def preprocess_photo (self, orgphoto, is_horizontal, convertmgr, photo, idlabel, creationlabel, sourcelabel):
 	#add graphic element from file to the photo:
 	from PIL import Image
 	image = Image.open(orgphoto)
@@ -279,6 +287,10 @@ def preprocess_photo (self, orgphoto, is_horizontal, convertmgr):
 	image.paste(element, (1, 100))
 	image.save(orgphoto)
 ```
+
+__*NOTE:*__ In case when this method is executed for command ```--test-convert``` ([ePiframe commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line)) ```photo``` can be ```None``` as the image is taken from path not from the source. Always check if this variable has a value!
+
+__*NOTE:*__ It is possible to process photo only from a specific source. In that case ```photo``` source label identified by ```sourcelabel``` should have specific value, i.e ```if photo and photo[sourcelabel] == source_name: <process>...```.
 
 __*NOTE:*__ It is possible to get image size directly from file with ```err, width, height = convertmanager().get_image_size(self.globalconfig.get('convert_bin_path'), orgphoto, constants.FIRST_FRAME_GIF)```
 
@@ -300,13 +312,17 @@ References:
 	|```width```|photo width in pixels|
 	|```height```|photo height in pixels|
 	|```is_horizontal```|boolean, indicates wheter frame is in horizontal position|
+	|```photo```|a Pandas element photo representation with all possible columns and ```idlabel``` as identifier|
+	|```idlabel```|photo ID label name|
+	|```creationlabel```|photo creation time label name|
+	|```sourcelabel```|photo source label name|
 * **Returns:**  _nothing_. This method should save modified photo as ```finalphoto``` name passed to it
 * **Current functionality of ePiframe:** adding weather information
 
 Example:
 
 ```
-def postprocess_photo (self, finalphoto, width, height, is_horizontal, convertmgr):
+def postprocess_photo (self, finalphoto, width, height, is_horizontal, convertmgr, photo, idlabel, creationlabel, sourcelabel):
 	#add text to converted photo:
 	from PIL import Image, ImageDraw, ImageFont, ImageColor
 	image = Image.open(finalphoto)
@@ -324,6 +340,10 @@ def postprocess_photo (self, finalphoto, width, height, is_horizontal, convertmg
 
 References: 
 * [ePiframe Weather Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/weathermanager.py)
+
+__*NOTE:*__ In case when this method is executed for command ```--test-convert``` ([ePiframe commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line)) ```photo``` can be ```None``` as the image is taken from path not from the source. Always check if this variable has a value!
+
+__*NOTE:*__ It is possible to process photo only from a specific source. In that case ```photo``` source label identified by ```sourcelabel``` should have specific value, i.e ```if photo and photo[sourcelabel] == source_name: <process>...```.
 
 __*NOTE:*__ Photo can be converted to some specific image mode at this point (e.g. black and white) and is in the size ready for the display (e.g. 800x480 pixels) so have that in mind during image manipulations.
 
@@ -682,6 +702,10 @@ But there are some basic steps typical for the ePiframe infrastructure that are 
 * Clone/download/extract the plugin to _<ePiframe_path>/plugins/<plugin_name_folder>_
 * Configure plugin with _<ePiframe_path>/plugins/<plugin_name_folder>.config.cfg_ file or in ePiframe WebUI under _Plugins/<plugin_name>_
 * Check configuration in WebUI or with ```./ePiframe.py --check-config``` command
+
+# License
+
+The default license for ePiframe-plugin base code is [LGPL-2.1 License](https://github.com/MikeGawi/ePiframe-plugin/blob/master/LICENSE) but it's up to the plugin author what license should it have. The plugin should not violate any copyright rules of used components and the author should take care to respect them. Some parts of the plugin code may be a valuable intellectual property and the ePiframe will not claim any part of it and will not take responsibility for its functionality. Long story short: *plugin is yours, do what you want as long as you don't harm anyone, especially yourself*. 
 
 # Examples
 
