@@ -288,7 +288,7 @@ def preprocess_photo (self, orgphoto, is_horizontal, convertmgr, photo, idlabel,
 	image.save(orgphoto)
 ```
 
-__*NOTE:*__ In case when this method is executed for command ```--test-convert``` ([ePiframe commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line)) ```photo``` can be ```None``` as the image is taken from path not from the source. Always check if this variable has a value!
+__*NOTE:*__ In case when this method is executed for command ```--test-convert``` ([ePiframe commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line)) ```photo``` can be an empty Pandas DataFrame as the image is taken from path not from the source. Always check if ```if not photo.empty ...```
 
 __*NOTE:*__ It is possible to process photo only from a specific source. In that case ```photo``` source label identified by ```sourcelabel``` should have specific value, i.e ```if photo and photo[sourcelabel] == source_name: <process>...```.
 
@@ -341,7 +341,7 @@ def postprocess_photo (self, finalphoto, width, height, is_horizontal, convertmg
 References: 
 * [ePiframe Weather Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/weathermanager.py)
 
-__*NOTE:*__ In case when this method is executed for command ```--test-convert``` ([ePiframe commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line)) ```photo``` can be ```None``` as the image is taken from path not from the source. Always check if this variable has a value!
+__*NOTE:*__ In case when this method is executed for command ```--test-convert``` ([ePiframe commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line)) ```photo``` can be an empty Pandas DataFrame as the image is taken from path not from the source. Always check if ```if not photo.empty ...```
 
 __*NOTE:*__ It is possible to process photo only from a specific source. In that case ```photo``` source label identified by ```sourcelabel``` should have specific value, i.e ```if photo and photo[sourcelabel] == source_name: <process>...```.
 
