@@ -1,4 +1,4 @@
-<h1>ePiframe-plugin Documentation</h1>
+<h1>ePiframe_plugin Documentation</h1>
 
 # Table of Contents
 <!--ts-->
@@ -35,7 +35,7 @@ Please follow these rules if you want to create your own plugin:
 * Add a short, one sentence, clear description what it does and put this data in the plugin class as well
 * What external API's/sites/modules/projects it uses and if they have limitations or price
 * Include a detailed installation instruction, what needs to be installed and configured
-* Add plugin details in [this table](https://github.com/MikeGawi/ePiframe-plugin#plugins-list) and create a pull request
+* Add plugin details in [this table](https://github.com/MikeGawi/ePiframe_plugin#plugins-list) and create a pull request
 
 ## Additional hints
 
@@ -45,12 +45,12 @@ Please follow these rules if you want to create your own plugin:
 
 # Get started
 
-* Start a new project with GitHub [*ePiframe-plugin*](https://github.com/MikeGawi/ePiframe-plugin) project template and give it a name (no dots!) that will be the name of the plugin - ePiframe will use this name to recognize the plugin module
+* Start a new project with GitHub [*ePiframe_plugin*](https://github.com/MikeGawi/ePiframe_plugin) project template and give it a name (no dots or dashes!) that will be the name of the plugin - ePiframe will use this name to recognize the plugin module
 * Inside ```_plugin.py``` file fill in the basic data like name, description, author, etc.
 * Start overriding methods that the plugin will use, use built-in modules or create new ones and have fun with it!
 * Create plugin configuration file
 * Test the plugin with ePiframe and put everything to the new GitHub project if all good
-* Add plugin details in [the table](https://github.com/MikeGawi/ePiframe-plugin) and create a pull request - it will appear on the main site
+* Add plugin details in [the table](https://github.com/MikeGawi/ePiframe_plugin) and create a pull request - it will appear on the main site
 
 # Structure
 
@@ -74,7 +74,7 @@ If exception occurs during the run of overridden method (that stops the next ste
 	   └── _plugin.py
 ```
 
-*plugin_name* is the main directory of the plugin and it should be changed to the actual plugin name. Dot characters ('.') are prohibited in the *plugin_name* due to Python module recognition!
+*plugin_name* is the main directory of the plugin and it should be changed to the actual plugin name. Dot ('.') and dash ('-') characters are prohibited in the *plugin_name* due to Python module recognition!
 
 |File|Description|
 |----|-----------|
@@ -705,14 +705,14 @@ But there are some basic steps typical for the ePiframe infrastructure that are 
 
 # License
 
-The default license for ePiframe-plugin base code is [LGPL-2.1 License](https://github.com/MikeGawi/ePiframe-plugin/blob/master/LICENSE) but it's up to the plugin author what license should it have. The plugin should not violate any copyright rules of used components and the author should take care to respect them. Some parts of the plugin code may be a valuable intellectual property and the ePiframe will not claim any part of it and will not take responsibility for its functionality. Long story short: *plugin is yours, do what you want as long as you don't harm anyone, especially yourself*. 
+The default license for ePiframe_plugin base code is [LGPL-2.1 License](https://github.com/MikeGawi/ePiframe_plugin/blob/master/LICENSE) but it's up to the plugin author what license should it have. The plugin should not violate any copyright rules of used components and the author should take care to respect them. Some parts of the plugin code may be a valuable intellectual property and the ePiframe will not claim any part of it and will not take responsibility for its functionality. Long story short: *plugin is yours, do what you want as long as you don't harm anyone, especially yourself*. 
 
 # Examples
 
-* [Cryptocurrency Information](https://github.com/MikeGawi/cryptocurrency-ePiframe)
-* [Frames and Quotes](https://github.com/MikeGawi/decor-ePiframe)
-* [Photo Filters](https://github.com/MikeGawi/cartoon-ePiframe)
+* [Cryptocurrency Information](https://github.com/MikeGawi/cryptocurrency_ePiframe)
+* [Frames and Quotes](https://github.com/MikeGawi/decor_ePiframe)
+* [Photo Filters](https://github.com/MikeGawi/cartoon_ePiframe)
 
 # Tutorial
 
-Small [tutorial](https://github.com/MikeGawi/ePiframe-plugin/blob/master/docs/TUTORIAL.md) that gathers all steps needed to implement a plugin with different functionalities.
+Small [tutorial](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/TUTORIAL.md) that gathers all steps needed to implement a plugin with different functionalities.
