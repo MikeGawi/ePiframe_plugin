@@ -1,4 +1,4 @@
-# ePiframe-plugin
+# ePiframe_plugin
 
 This code is a template to create new plugins for [ePiframe](https://github.com/MikeGawi/ePiframe) photo frame.
 
