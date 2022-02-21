@@ -22,7 +22,7 @@ But also methods to extend not-strictly photo related functions:
 
 # How to start?
 
-Check the detailed [documentation](https://github.com/MikeGawi/ePiframe-plugin/blob/master/docs/SETUP.md) with examples and [tutorial](https://github.com/MikeGawi/ePiframe-plugin/blob/master/docs/TUTORIAL.md) and have fun!
+Check the detailed [documentation](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md) with examples and [tutorial](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/TUTORIAL.md) and have fun!
 
 # Contribution
 
@@ -37,7 +37,7 @@ Please follow these rules if you want to create your own plugin:
 
 |Plugin name and URL|Author|Desription|
 |-------------------|------|----------|
-|[cryptocurrency-ePiframe](https://github.com/MikeGawi/cryptocurrency-ePiframe)|[MikeGawi](https://github.com/MikeGawi)|Displays cryptocurrency price and percentage change on frame|
-|[cartoon-ePiframe](https://github.com/MikeGawi/cartoon-ePiframe)|[MikeGawi](https://github.com/MikeGawi)|Photo cartoon-like style preprocessing|
-|[decor-ePiframe](https://github.com/MikeGawi/decor-ePiframe)|[MikeGawi](https://github.com/MikeGawi)|Display decorative frames and quotes on frame|
+|[cryptocurrency_ePiframe](https://github.com/MikeGawi/cryptocurrency_ePiframe)|[MikeGawi](https://github.com/MikeGawi)|Displays cryptocurrency price and percentage change on frame|
+|[cartoon_ePiframe](https://github.com/MikeGawi/cartoon_ePiframe)|[MikeGawi](https://github.com/MikeGawi)|Photo cartoon-like style preprocessing|
+|[decor_ePiframe](https://github.com/MikeGawi/decor_ePiframe)|[MikeGawi](https://github.com/MikeGawi)|Display decorative frames and quotes on frame|
 ||||
