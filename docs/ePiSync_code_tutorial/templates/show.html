@@ -1,0 +1,31 @@
+{% extends "layout.html" %} <!-- This will load ePiframe template, jQuery and Bootstrap -->
+{% block title %}ePiSync show{% endblock %}  <!-- Site title -->
+{% block head %}
+  {{ super() }}  <!-- Load all parent scripts -->
+{% endblock %}
+{% block content %}
+   <!-- Content -->
+		<div class="container">
+		  <h3 class="pt-2"> ePiSync Images: </h3>
+		  <div class="row row-cols-auto p-4">
+			{% for file in range(number) %}  <!-- Loop through file indices -->
+			<div class="col-auto p-2">
+				<div class="row px-0 col-auto mx-auto border border-4 rounded-3" >
+					<a href="{{ url_for('get_sync_image') }}?file={{ file }}" target="_blank" data-bs-toggle="tooltip" title="Click to view image" class="px-0" data-bs-placement="top" style="height: {{ height }}px; width: {{ width }}px;">
+						<img src="{{ url_for('get_sync_image') }}?thumb=&file={{ file }}" alt="No Photo!" width="{{ width }}" height="{{ height }}"/>
+					</a>
+				</div>					
+			</div>
+			{% endfor %}
+		  </div>
+		</div>
+   <script>
+		//Scripts
+		//Show tooltips
+		$('document').ready(function(){
+			$('[data-bs-toggle=tooltip]').tooltip();
+		});
+		
+		$(".episync-menu").addClass("link-light"); //Light up website link in menu
+   </script>
+{% endblock %}

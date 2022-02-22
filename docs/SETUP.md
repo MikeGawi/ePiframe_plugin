@@ -50,7 +50,7 @@ Please follow these rules if you want to create your own plugin:
 * Start overriding methods that the plugin will use, use built-in modules or create new ones and have fun with it!
 * Create plugin configuration file
 * Test the plugin with ePiframe and put everything to the new GitHub project if all good
-* Add plugin details in [the table](https://github.com/MikeGawi/ePiframe_plugin) and create a pull request - it will appear on the main site
+* Add plugin details in [the table](https://github.com/MikeGawi/ePiframe_plugin#plugins-list) and create a pull request - it will appear on the main site
 
 # Structure
 
@@ -140,6 +140,8 @@ Other ```plugin``` class exposed methods to override:
 
 This method should collect the data of new photos and return Pandas DataFrame that will be processed (i.e. filtered, sorted, combined with other sources and used to pick up photo). The ID (unique and can be filename or some id from image hosting site), creation time and source columns are crucial - with them the sorting and filtering will work out of the box.
 
+ePiframe works only on the list of photos information not on files as it would be resources consuming. The only file that it works on is the one that is processed and displayed on frame.
+
 Examples:
 
 ```
@@ -186,10 +188,12 @@ __*NOTE:*__ Creation time must be in _YYYY-mm-ddTHH:MM:SSZ_, i.e. 2021-01-27T22:
 	|```idlabel```|photo ID label name|
 	|```creationlabel```|photo creation time label name|
 	|```sourcelabel```|photo source label name|
-* **Returns:** photo final filename, best if it would contain an extension
+* **Returns:** photo final path + filename, best if it would contain an extension
 * **Current functionality of ePiframe:** downloading selected photo from Google Photos and/or copying from local storage
 
 This method is optional and if not overriden, the standard copy from photo id (as a source location) to filename method will be used, extension will be added automatically. Alos, it will be executed only if the photo that has been picked up is from the source collected in ```add_photo_source``` method and identified by ```self.SOURCE``` value.
+
+ePiframe works only on the list of photos information not on files as it would be resources consuming. The only file that it works on is the one that is processed and displayed on frame. This method is used to download or get the file that has been picked from the list by ePiframe. If the source is for example a hosting site then it needs a method to download it, authenticate, pass key, etc. and should do that with ID that is passed in the Pandas row. 
 
 Examples:
 
@@ -461,14 +465,35 @@ Inside plugin templates folder create file test.html with:
 	   <!-- Content -->
 		<p>{{ text }}</p>
 	   <script>
-	   	<!-- Scripts -->
-			$(".test-menu").addClass("link-light"); <!--Light up website link in menu -->
+	   	//Scripts
+			$(".test-menu").addClass("link-light"); //Light up website link in menu
 	   </script>
 	{% endblock %}	
 ```
 
 References:
 * [ePiframe Templates](https://github.com/MikeGawi/ePiframe/blob/master/templates/)
+
+__*NOTE:*__ Pass a plugin class to _<website_name>.py_ file with (check [tutorial](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/ePiSync_tutorial_code/show.py):
+```
+from flask import Blueprint, render_template
+from flask_login import login_required	
+
+class <website_name>():
+	#constructor to pass plugin class
+	def __init__(self, plugin):
+		self.plugin = plugin
+
+	#returns generated blueprint website with injected plugin class
+	def get_<website_name>_bp(self):	
+		<website_name>_bp = Blueprint('<website_name>_bp', __name__,  template_folder='templates', static_folder='static' )
+		@<website_name>_bp.route('/test') #this is the URL of the site
+		@login_required #user login is needed to visit. The order matters so this decorator should be the last one before method.
+		def view():    
+			return render_template('test.html', text='This text will be passed!', something=self.plugin...) #use plugin class here
+
+		return <website_name>_bp
+```
 
 __*NOTE:*__ It is possible to add just the menu entry (e.g. add a link on ePiframe for a server site) with:
 
@@ -552,8 +577,8 @@ References:
 # Creating configuration
 
 Configuration in ePiframe is very strict to validation, types, dependencies, etc. so the plugin should be the same. Settings are dynamically rendered in the WebUI according to the type thus some additional steps needs to be performed to get that right. There are two things to be done:
-* [Configuration class](#configuration__class)
-* [Configuration file](#configuration__file)
+* [Configuration class](#configuration-class)
+* [Configuration file](#configuration-file)
 
 The plugin configuration can be checked the same way as ePiframe configuration:
 
@@ -581,8 +606,8 @@ Possible ```misc.configprop``` properties and methods passed in constructor:
 |```prop_type```|```STRING_TYPE```|Type of the configuration property (check types below), used to validation and rendering in the WebUI|
 |```notempty```|```True```|Flag to disallow empty values for the entry. ```True``` - value is needed, ```False``` - value can be empty|
 |```dependency```|```None```|Property dependency check. More on that below|
-|```minvalue```|```None```|Used to validate minimal value of numerical properties|
-|```maxvalue```|```None```|Used to validate maximum value of numerical properties|
+|```minvalue```|```None```|Used to validate minimal value of numerical properties. Can be used without ```maxvalue```|
+|```maxvalue```|```None```|Used to validate maximum value of numerical properties. Can be used without ```minvalue```|
 |```checkfunction```|```None```|Functon used to validate value of the property. It should return ```True``` when property value is correct|
 |```special```|```None```|Structure to check more complicated property dependencies. More on that below|
 |```length```|```None```|Property length check, e.g. list should have this number of elements. Should be used together with ```delimiter```|
@@ -645,6 +670,10 @@ Examples:
 
 __*NOTE:*__ To access main plugin class inside ```configmgr``` body use ```self.main_class```
 
+__*NOTE:*__ To get plugins config properties simply use ```self.config.get(NAME)``` for text properties and ```self.config.getint(NAME)``` for integer. Check [configbase class](https://github.com/MikeGawi/ePiframe/tree/master/modules/base/configbase.py) for more methods.
+
+__*NOTE:*__ To get global ePiframe config properties simply use ```self.globalconfig.get(NAME)``` for text properties and ```self.globalconfig.getint(NAME)``` for integer. Check [configbase class](https://github.com/MikeGawi/ePiframe/tree/master/modules/base/configbase.py) for more methods and [ePiframe config.cfg file](https://github.com/MikeGawi/ePiframe/blob/master/config.cfg) for more properties
+
 ## Configuration file
 
 Fill in _<plugin_name>/default/config.default_ according to added settings and copy it to _<plugin_name>/config.cfg_ file (default file is used to restore default values the other one is used for the configuration).
@@ -695,8 +724,8 @@ __*NOTE:*__ Script will handle moving entries from one section to another as ent
 # Plugin installation
 
 According to the [contribution statements](#contribution), plugin should precisely describe:
-* What external API's/sites/modules/projects it uses and if they have limitations or price
-* Include a detailed installation instruction, what needs to be installed and configured
+> What external API's/sites/modules/projects it uses and if they have limitations or price
+> Include a detailed installation instruction, what needs to be installed and configured
 
 But there are some basic steps typical for the ePiframe infrastructure that are common for all plugins:
 * Clone/download/extract the plugin to _<ePiframe_path>/plugins/<plugin_name_folder>_
@@ -715,4 +744,4 @@ The default license for ePiframe_plugin base code is [LGPL-2.1 License](https://
 
 # Tutorial
 
-Small [tutorial](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/TUTORIAL.md) that gathers all steps needed to implement a plugin with different functionalities.
+[Tutorial](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/TUTORIAL.md) that gathers all steps needed to implement a plugin with different functionalities.
