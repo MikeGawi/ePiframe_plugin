@@ -361,7 +361,7 @@ def postprocess_photo (self, finalphoto, width, height, is_horizontal, convertmg
 
 * ```Image.open``` opens an image from ```finalphoto``` path
 * ```is_horizontal``` is passed to the method by ePiframe and it's indicating if the frame is in horizontal position
-* ```image.transpose``` is a Pillow transposing method according to specified degrees value, e.g. ```Image.ROTATE_90```
+* ```image.transpose``` is a Pillow transposing method that is rotating to specified angle value, e.g. ```Image.ROTATE_90```
 * ```self.globalconfig.getint('rotation')``` returns current photo rotation in degrees
 * ```image.save``` saves processed image to provided ```finalphoto``` path - it's overwriting the input file
 
