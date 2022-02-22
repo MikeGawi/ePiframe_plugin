@@ -331,8 +331,8 @@ In the case of our plugin the photo list has not been changed but we could see h
 *Photo showed from the new source will have a watermark*
 
 Plugin base class allows two methods of the chosen (from collection) photo processing:
-* preprocessing done by ```preprocess_photo```(https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#photo-preprocessing) method that processes the photo before the basic conversion when it is currently in the original version (high quality photo)
-* postprocessing done by ```postprocess_photo```(https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#photo-postprocessing) method that processes the photo before sending to display (and it's already converted to the display)
+* preprocessing done by [```preprocess_photo```](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#photo-preprocessing) method that processes the photo before the basic conversion when it is currently in the original version (high quality photo)
+* postprocessing done by [```postprocess_photo```](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#photo-postprocessing) method that processes the photo before sending to display (and it's already converted to the display)
 
 Watermark adding procedure can be done on both but postprocessing is more demanding as photo can already be converted for the display, so we will use this for tutorial purposes.
 
@@ -394,7 +394,7 @@ def postprocess_photo (self, finalphoto, width, height, is_horizontal, convertmg
 
 * this method is executed for every photo but with ```if self.SOURCE and not photo.empty and photo[sourcelabel] == self.SOURCE``` we determine that it will be done only for photos with the source like ```self.SOURCE```. Checking if ```photo``` is empty is because image pre/postprocessing may be also done manually from the [command line](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line) and in that case there is no photos Pandas collection
 * ```finalphoto``` is opened, rotated to an normal position (if vertical) and converted to RGBA (Red Green Blue + Alpha) as ```newimage```, to not supress any transparent areas of watermark. Old color mode is saved to ```mode```
-* watermark is opened to ```watermark```, also converted to RGBA mode, resized to 1/10 of a width and height of target photo and pasted on left-bottom position minus 10 pixels from left and bottom
+* watermark is opened to ```watermark```, also converted to RGBA mode, resized to 1/10 of a width and height of target photo and pasted on right-bottom position minus 10 pixels margin from right and bottom
 * image is converted back to original color mode, rotated back to initial rotation and saved as input image
 
 The results look like this:
