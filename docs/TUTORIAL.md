@@ -27,11 +27,11 @@ Let's name this plugin *ePiSync* to stick to ePiframe name and emphasize sync fu
 
 Let's put our data:
 ```
-	name = 'ePiSync'
-	author = 'ePiframe_plugin tutorial'
-	description = 'Sync photos with rsync from remote location, generate thumbnails, then add watermark, API method and a website to view new photos'
-	site = 'https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/TUTORIAL.md'
-	info = 'All steps gathered here to create a multi-functional ePiframe plugin'
+name = 'ePiSync'
+author = 'ePiframe_plugin tutorial'
+description = 'Sync photos with rsync from remote location, generate thumbnails, then add watermark, API method and a website to view new photos'
+site = 'https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/TUTORIAL.md'
+info = 'All steps gathered here to create a multi-functional ePiframe plugin'
 ```
 
 ### Installation of 3rd party components
@@ -42,8 +42,8 @@ If there are more prerequisites needed for your plugin, i.e. external API's, sit
 
 Let's install rsync:
 ```
-	sudo apt update
-	sudo apt install rsync
+sudo apt update
+sudo apt install rsync
 ```
 
 ## Implementation
@@ -121,19 +121,19 @@ class configmgr (configbase):
 
 to put the configuration entries to. This structure allows validation, type check, value check and lot more (WebUI rendering for example) of plugin settings. Let's put or new variables:
 ```
-	## Config manager class.
-	class configmgr (configbase):
-		def load_settings(self):
-			self.SETTINGS = [
-				configprop('is_enabled', self, prop_type=configprop.BOOLEAN_TYPE), # this setting is required! 
-				#local path to sync to, notice that convert method is used to pass value to the create_dir method that creates the path if not exists
-				#that's just a tricky way to use convert
-				configprop('local_path', self, prop_type=configprop.FILE_TYPE, dependency='is_enabled', convert=localsourcemanager.create_dir),
-				configprop('remote_path', self, dependency='is_enabled'), #this is string (by default)
-				configprop('remote_host', self, dependency='is_enabled'), #all are dependent to is_enabled
-				configprop('remote_user', self, dependency='is_enabled'), #and will be enabled only if is_enabled is true
-				configprop('sync_timeout', self, minvalue=2, maxvalue=10, prop_type=configprop.INTEGER_TYPE, dependency='is_enabled'), #integer values with min and max thresholds
-				...
+## Config manager class.
+class configmgr (configbase):
+	def load_settings(self):
+		self.SETTINGS = [
+			configprop('is_enabled', self, prop_type=configprop.BOOLEAN_TYPE), # this setting is required! 
+			#local path to sync to, notice that convert method is used to pass value to the create_dir method that creates the path if not exists
+			#that's just a tricky way to use convert
+			configprop('local_path', self, prop_type=configprop.FILE_TYPE, dependency='is_enabled', convert=localsourcemanager.create_dir),
+			configprop('remote_path', self, dependency='is_enabled'), #this is string (by default)
+			configprop('remote_host', self, dependency='is_enabled'), #all are dependent to is_enabled
+			configprop('remote_user', self, dependency='is_enabled'), #and will be enabled only if is_enabled is true
+			configprop('sync_timeout', self, minvalue=2, maxvalue=10, prop_type=configprop.INTEGER_TYPE, dependency='is_enabled'), #integer values with min and max thresholds
+			...
 ```
 
 ```local_path``` (DEST = destination of photos) is a file type property that existance will be checked during configuration loading. Here's a small trick: ```convert``` method used for converting value property to another value (it just passes the value to the method and returns new value) is used to create the directory if it's missing. It doesn't change the value as method is not returning new one. That's a trick to do something with the value before validation. The method ```create_dir``` is a part of [localsourcemanager](https://github.com/MikeGawi/ePiframe/blob/master/modules/localsourcemanager.py) module.
@@ -153,14 +153,14 @@ For collecting the DataFrame we can use ePiframe built-in [localsourcemanager](h
 Here's the code:
 
 ```
-	def add_photo_source (self, idlabel, creationlabel, sourcelabel, photomgr):
-		cmd = 'rsync --timeout={} --ignore-existing {}@{}:{}* {} 2>&1 > /dev/null' #command string
-		source = self.config.get('remote_path') if self.config.get('remote_path').endswith('/') else self.config.get('remote_path') + '/' #adding / at the end if not exists
-		os.system(cmd.format(self.config.get('sync_timeout'), self.config.get('remote_user'), self.config.get('remote_host'), source, self.config.get('local_path'))) #starting command with args
-				
-		loc = localsourcemanager (self.config.get('local_path'), False, constants.EXTENSIONS) #getting synced files with localsourcemanager
-		self.SOURCE = "'{}' plugin source".format(self.name) #it is required to set the source name
-		return loc.get_local_photos(idlabel, creationlabel, sourcelabel, self.SOURCE) #returning dataframe of photos with needed labels
+def add_photo_source (self, idlabel, creationlabel, sourcelabel, photomgr):
+	cmd = 'rsync --timeout={} --ignore-existing {}@{}:{}* {} 2>&1 > /dev/null' #command string
+	source = self.config.get('remote_path') if self.config.get('remote_path').endswith('/') else self.config.get('remote_path') + '/' #adding / at the end if not exists
+	os.system(cmd.format(self.config.get('sync_timeout'), self.config.get('remote_user'), self.config.get('remote_host'), source, self.config.get('local_path'))) #starting command with args
+
+	loc = localsourcemanager (self.config.get('local_path'), False, constants.EXTENSIONS) #getting synced files with localsourcemanager
+	self.SOURCE = "'{}' plugin source".format(self.name) #it is required to set the source name
+	return loc.get_local_photos(idlabel, creationlabel, sourcelabel, self.SOURCE) #returning dataframe of photos with needed labels
 ```
 
 * OS command - ``cmd`` was combined from config properties (check ```cmd.format...``` part)
@@ -196,14 +196,14 @@ So this method should _retrieve the file_ and return the full path of the downlo
 
 To use them just simply do:
 ```
-	def add_photo_source_get_file (self, photo, path, filename, idlabel, creationlabel, sourcelabel, photomgr):
-		from modules.convertmanager import convertmanager
-		convertman = convertmanager()
-		filename_ret = ''		
-		err, imagetype = convertman.get_image_format(self.globalconfig.get('convert_bin_path'), photo[idlabel], constants.FIRST_FRAME_GIF) #if this is a GIF then just check the first frame
-		if not err and imagetype:
-			filename_ret = filename + "." + constants.TYPE_TO_EXTENSION[constants.MIME_START + imagetype.lower()]
-		filename_ret = os.path.join(path, filename_ret)
+def add_photo_source_get_file (self, photo, path, filename, idlabel, creationlabel, sourcelabel, photomgr):
+	from modules.convertmanager import convertmanager
+	convertman = convertmanager()
+	filename_ret = ''		
+	err, imagetype = convertman.get_image_format(self.globalconfig.get('convert_bin_path'), photo[idlabel], constants.FIRST_FRAME_GIF) #if this is a GIF then just check the first frame
+	if not err and imagetype:
+		filename_ret = filename + "." + constants.TYPE_TO_EXTENSION[constants.MIME_START + imagetype.lower()]
+	filename_ret = os.path.join(path, filename_ret)
 ```
 
 * ```filename``` is photo target name (only), no extension, ```path``` is the target path so the method should return "path + filename + . + extension"
@@ -218,15 +218,15 @@ To use them just simply do:
 
 So we have now a final photo path with full destination filename. The last thing we need to do is copy the source file synced from remote location to ```filename_ret``` with *shutil*. The final code looks like this:
 ```	
-	def add_photo_source_get_file (self, photo, path, filename, idlabel, creationlabel, sourcelabel, photomgr):
-		filename_ret = filename	
-		#getting image MIME type with ImageMagick
-		err, imagetype = convertmanager().get_image_format(self.globalconfig.get('convert_bin_path'), photo[idlabel], constants.FIRST_FRAME_GIF) #if this is a GIF then just check the first frame
-		if not err and imagetype:
-			filename_ret = filename + "." + constants.TYPE_TO_EXTENSION[constants.MIME_START + imagetype.lower()] #converting MIME type to extension
-		filename_ret = os.path.join(path, filename_ret) #combining filename
-		shutil.copy(photo[idlabel], filename_ret) #copying to target path
-		return filename_ret
+def add_photo_source_get_file (self, photo, path, filename, idlabel, creationlabel, sourcelabel, photomgr):
+	filename_ret = filename	
+	#getting image MIME type with ImageMagick
+	err, imagetype = convertmanager().get_image_format(self.globalconfig.get('convert_bin_path'), photo[idlabel], constants.FIRST_FRAME_GIF) #if this is a GIF then just check the first frame
+	if not err and imagetype:
+		filename_ret = filename + "." + constants.TYPE_TO_EXTENSION[constants.MIME_START + imagetype.lower()] #converting MIME type to extension
+	filename_ret = os.path.join(path, filename_ret) #combining filename
+	shutil.copy(photo[idlabel], filename_ret) #copying to target path
+	return filename_ret
 ```
 
 **_❗ IMPORTANT ❗_** This method will be executed ONLY when the ```sourcelabel``` pandas column value of chosen photo is the same as set in [Step 1: Photo collecting](#step-1-photo-collection).
@@ -269,31 +269,31 @@ And again we should add width and height to configuration for user customization
 
 So let's combine this into code:
 ```
-	__THUMB_NAME = "thumb_"
+__THUMB_NAME = "thumb_"
 
-	def __subproc (self, arg):
-		#method to start process with arguments. 
-		#it needs a list of arguments
-		args = arg.split()
-		process = subprocess.Popen(args, stdout=subprocess.PIPE)
-		process.wait()
-		out, err = process.communicate()
-		return out, err 
-	
-	#method that changes collected photo list
-	def change_photos_list (self, idlabel, creationlabel, sourcelabel, photo_list, photomgr, indexmgr, filteringmgr):		
-		size = self.config.get('thumb_width') + 'x' + self.config.get('thumb_height')
-		thumb_cmd = '{} {} -background white -gravity center -sample {} -extent {} {}' #thumbnail generation command
-		rows = photo_list[photo_list[sourcelabel] == self.SOURCE] #getting rows only from the source of this plugin
-		localsourcemanager.create_dir(os.path.join(self.config.get('local_path'), self.__THUMB_NAME + '/')) #creating thumbnails directory
-		
-		for index, row in rows.iterrows(): #iteriting through rows
-			thumb_file = os.path.join(os.path.dirname(row[idlabel]), self.__THUMB_NAME + '/', self.__THUMB_NAME + os.path.basename(row[idlabel])) #getting thumb path
-			if not os.path.exists(thumb_file): 
-				out, err = self.__subproc(thumb_cmd.format(self.globalconfig.get('convert_bin_path'), row[idlabel], size, size, thumb_file)) #creating thumbnail
-				if err:	raise Exception(err)
-				
-		return photo_list
+def __subproc (self, arg):
+	#method to start process with arguments. 
+	#it needs a list of arguments
+	args = arg.split()
+	process = subprocess.Popen(args, stdout=subprocess.PIPE)
+	process.wait()
+	out, err = process.communicate()
+	return out, err 
+
+#method that changes collected photo list
+def change_photos_list (self, idlabel, creationlabel, sourcelabel, photo_list, photomgr, indexmgr, filteringmgr):		
+	size = self.config.get('thumb_width') + 'x' + self.config.get('thumb_height')
+	thumb_cmd = '{} {} -background white -gravity center -sample {} -extent {} {}' #thumbnail generation command
+	rows = photo_list[photo_list[sourcelabel] == self.SOURCE] #getting rows only from the source of this plugin
+	localsourcemanager.create_dir(os.path.join(self.config.get('local_path'), self.__THUMB_NAME + '/')) #creating thumbnails directory
+
+	for index, row in rows.iterrows(): #iteriting through rows
+		thumb_file = os.path.join(os.path.dirname(row[idlabel]), self.__THUMB_NAME + '/', self.__THUMB_NAME + os.path.basename(row[idlabel])) #getting thumb path
+		if not os.path.exists(thumb_file): 
+			out, err = self.__subproc(thumb_cmd.format(self.globalconfig.get('convert_bin_path'), row[idlabel], size, size, thumb_file)) #creating thumbnail
+			if err:	raise Exception(err)
+
+	return photo_list
 ```
 
 * ```__subproc``` method is a helping method to start a process and get command ouput. This is just a different method of running OS command than ```os.system(...)``` used in [Step 1: Photo collecting](#step-1-photo-collection)
@@ -334,16 +334,75 @@ Plugin base class allows two methods of the chosen (from collection) photo proce
 * preprocessing done by ```preprocess_photo```(https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#photo-preprocessing) method that processes the photo before the basic conversion when it is currently in the original version (high quality photo)
 * postprocessing done by ```postprocess_photo```(https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#photo-postprocessing) method that processes the photo before sending to display (and it's already converted to the display)
 
-Watermark adding procedure can be done on both but postprocessing is more demanding as photo can already be rotated to vertical frame and have reduced colors for the display, so we will use this for tutorial purposes.
+Watermark adding procedure can be done on both but postprocessing is more demanding as photo can already be converted for the display, so we will use this for tutorial purposes.
 
 Both methods are not returning any output as they should overwrite passed photo filename.
 
 For adding watermark, so pasting other image atop of the photo, we will use [Pillow](https://pillow.readthedocs.io/en/stable/) that is a dependency of ePiframe. Pillow - The Python Imaging Library adds image processing capabilities to Python interpreter.
 
-The code is pretty straightforward as Pillow is easy to use but:
+The code is pretty straightforward as Pillow is easy to use but the photo is already converted to fit the display and that's a bit problematic:
+* the photo can be in vertical position, rotated clockwise or counterclockwise to fit vertically positioned frames
+* have reduced palette of colors as can be converted to fit black and white e-Paper display
 
+Easiest way to handle rotation is to read ePiframe global configuration and get rotation state, then rotate in the opposite direction, process the image and rotate back. To do that just simply:
+```
+from PIL import Image, ImageColor
 
+def postprocess_photo (self, finalphoto, width, height, is_horizontal, convertmgr, photo, idlabel, creationlabel, sourcelabel):
+	image = Image.open(finalphoto)
+	if not is_horizontal: image = image.transpose(Image.ROTATE_90 if self.globalconfig.getint('rotation') == 90 else Image.ROTATE_270) #rotating image if frame not in horizontal position
+	...
+	<image processing>
+	...
+	
+	if not is_horizontal: image = image.transpose(Image.ROTATE_270 if self.globalconfig.getint('rotation') == 90 else Image.ROTATE_90) #rotating back if in vertical position
+	image.save(finalphoto) #saving as final photo
+```
 
+* ```Image.open``` opens an image from ```finalphoto``` path
+* ```is_horizontal``` is passed to the method by ePiframe and it's indicating if the frame is in horizontal position
+* ```image.transpose``` is a Pillow transposing method according to specified degrees value, e.g. ```Image.ROTATE_90```
+* ```self.globalconfig.getint('rotation')``` returns current photo rotation in degrees
+* ```image.save``` saves processed image to provided ```finalphoto``` path - it's overwriting the input file
+
+This code loads the photo to ```image``` object, resets the rotation if any exists, processes it and saves rotated image back.
+
+The next problem is current photo colors mode we need to take care of as new pasted image, our watermark, can be in a different mode. To get current ```image``` mode use ```mode = image.mode``` and to convert ```watermark``` to this mode - ```watermark = watermark.convert(mode)```. It is also possible to set other modes, i.e. RGB, RGBA, CMYK [and more](https://pillow.readthedocs.io/en/stable/handbook/concepts.html).
+
+We also need method to resize watermark - [```Image.resize```](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.resize) and to paste image to image - [```Image.paste```](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.paste). 
+
+With all that knowledge we can summarize or code like this:
+```
+from PIL import Image, ImageColor
+
+def postprocess_photo (self, finalphoto, width, height, is_horizontal, convertmgr, photo, idlabel, creationlabel, sourcelabel):
+	if self.SOURCE and not photo.empty and photo[sourcelabel] == self.SOURCE:
+		image = Image.open(finalphoto)
+		mode = image.mode #get photo mode
+		if not is_horizontal: image = image.transpose(Image.ROTATE_90 if self.globalconfig.getint('rotation') == 90 else Image.ROTATE_270) #rotating image if frame not in horizontal position
+		newimage = image.convert('RGBA') #converting to RGB with alpha
+
+		watermark = Image.open(os.path.join(self.path, 'static/images/watermark.png')).convert('RGBA') #self.path is a plugin path
+		watermark = watermark.resize((width//10, height//10)) #resizing watermark to 1/10 of width and height
+		newimage.paste(watermark, (width-10-width//10, height-10-height//10), watermark) #pasting watermark on the photo and with watermark mask
+		newimage = newimage.convert(mode) #convert back to original photo mode
+
+		if not is_horizontal: newimage = newimage.transpose(Image.ROTATE_270 if self.globalconfig.getint('rotation') == 90 else Image.ROTATE_90) #rotating back if in vertical position
+
+		newimage.save(finalphoto) #saving as final photo
+```
+
+* this method is executed for every photo but with ```if self.SOURCE and not photo.empty and photo[sourcelabel] == self.SOURCE``` we determine that it will be done only for photos with the source like ```self.SOURCE```. Checking if ```photo``` is empty is because image pre/postprocessing may be also done manually from the [command line](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line) and in that case there is no photos Pandas collection
+* ```finalphoto``` is opened, rotated to an normal position (if vertical) and converted to RGBA (Red Green Blue + Alpha) as ```newimage```, to not supress any transparent areas of watermark. Old color mode is saved to ```mode```
+* watermark is opened to ```watermark```, also converted to RGBA mode, resized to 1/10 of a width and height of target photo and pasted on left-bottom position minus 10 pixels from left and bottom
+* image is converted back to original color mode, rotated back to initial rotation and saved as input image
+
+The results look like this:
+<p align="center">
+	<img src ="https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/assets/watermark.bmp" width="400">
+</p>
+
+When taken care of image mode and rotation, plugin can make any photo processing as long as it's not hardware demanding or at least optimized for Raspberry Pi.
 
 ### Step 5: Extending API
 
