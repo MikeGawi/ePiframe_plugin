@@ -35,7 +35,7 @@ Please follow these rules if you want to create your own plugin:
 
 # Plugins list
 
-|Plugin name and URL|Author|Desription|
+|Plugin name and URL|Author|Description|
 |-------------------|------|----------|
 |[cryptocurrency_ePiframe](https://github.com/MikeGawi/cryptocurrency_ePiframe)|[MikeGawi](https://github.com/MikeGawi)|Displays cryptocurrency price and percentage change on frame|
 |[cartoon_ePiframe](https://github.com/MikeGawi/cartoon_ePiframe)|[MikeGawi](https://github.com/MikeGawi)|Photo cartoon-like style preprocessing|

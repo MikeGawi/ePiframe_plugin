@@ -354,7 +354,7 @@ __*NOTE:*__ Photo can be converted to some specific image mode at this point (e.
 ## Extending API
 
 * **Method to override:** ```extend_api```
-* **Usage cases:** extend API functions, e.g. adding REST API,return data by query/website like get hardware statistics, expose API for smart home server, etc.
+* **Usage cases:** extend API functions, e.g. adding REST API, return data by query/website like get hardware statistics, expose API for smart home server, etc.
 * **Passed modules:** 
 	* [WebUI Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/webuimanager.py) - Websites rendering, API functions, settings handling from WebUI, etc.
 	* [Users Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/usersmanager.py) - WebUI users handling, access to users database, etc.

@@ -408,6 +408,98 @@ When taken care of image mode and rotation, plugin can make any photo processing
 
 *Plugin will extend the ePiframe API with methods to show thumbnail and original photo*
 
+ePiframe comes with a built in [API](https://github.com/MikeGawi/ePiframe/blob/master/docs/API.md) that can perform simple actions by calling an URL (with [curl](https://curl.se/) for example), e.g. reboot frame, change photo, get logs, get current photo, etc. Plugins can extend this functionality and add new actions like adding REST API, return hardware statistics, expose API for smart home server, etc.
+
+As ePiframe WebUI is based on Flask so are API methods and in simple words we create a method to perform action or return something and create a binding to this method that is triggered by URL.
+
+Plugin base class method to overwrite is [```extend_api```](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#extending-api) that returns list of ```webmgr.site_bind``` objects (possible fields: ```url```, ```func```, ```methods = ['GET']```, ```defaults = None```) that have typical [Flask binding](https://flask.palletsprojects.com/en/2.0.x/quickstart/#url-building) syntax and point to a function to trigger, where ```webmgr``` is a passed [WebUI Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/webuimanager.py).
+
+Example:
+```
+#method to call with /api/get_text/<text>
+def get_text_func(self, text=str()):
+	from flask import jsonify
+	return jsonify(text_label=text)	
+
+#This is the plugin method that is fired:
+def extend_api (self, webmgr, usersmgr, backend):
+	return [ webmgr.site_bind('/api/get_text/<text>', self.get_text_func) ]
+```
+
+* ```get_text_func``` method receives ```text``` value from ```<IP>/api/get_text/<text>``` URL and returns JSON version of it
+* ```extend_api``` method returns Flask binding to ```get_text_func``` method to bind method and URL
+
+More than one method can be added and ```extend_api``` method should just return a list of them.
+
+So back to our plugin: *API method should return a thumbnail and original photo* and that will be used by new website to display photos synced by the plugin.
+
+A good working reference would be ```get_image``` method in [WebUI Manager](https://github.com/MikeGawi/ePiframe/blob/eb3753684360848cc79278a45121879b5bd9ab0b/modules/webuimanager.py#L174) that is basically doing the same thing - it just uses Flask ```send_file``` method to expose file under URL.
+
+As our new URL will return only one file at once we need to allow to pick any file and have option to display full-sized photo or just a thumbnail. Every Flask bounded method get's a request that is passed to URL and it contains arguments. To get request argument we need to use ```request.args.get(<NAME>)``` and get the passed value with ```http://<URL>?<NAME>=<VALUE>&<NAME2>=<VALUE2>&...```. In our case we need to get index of the file and thumbnail flag. To have the list of synced files we can use [localsourcemanager](https://github.com/MikeGawi/ePiframe/blob/master/modules/localsourcemanager.py) and ```get.files()``` method as we did in [Step 1: Photo collecting](#step-1-photo-collection).
+
+To get the files from configured path:
+```
+localsourcemanager(self.config.get('local_path'), False, constants.EXTENSIONS).get_files()
+```
+
+* this returns a list of gathered photos paths according to their extensions. ```False``` flag is to not check the location recursively
+
+Flask [```send_file```](https://flask.palletsprojects.com/en/2.0.x/api/#flask.send_file) method that retuns file under URL needs to know the MIME type of the image, to get that we can use ePiframe dictionary in [constants file](https://github.com/MikeGawi/ePiframe/blob/master/misc/constants.py):
+```
+mimetype=constants.EXTENSION_TO_TYPE[str(filename).rsplit('.')[-1].lower()])
+```
+
+* ```mimetype``` will have MIME type value of the ```filename``` according to it's extracted extension
+
+After gathering all information, we get code like this:
+```
+from flask import request, send_file
+from flask_login import login_required
+
+def get_files(self):
+	return localsourcemanager(self.config.get('local_path'), False, constants.EXTENSIONS).get_files() #get all files with localsourcemanager
+
+#login is required to use this API entry
+@login_required
+def get_sync_image(self):
+	filename = str()
+	filenum =  int(request.args.get('file')) if 'file' in request.args and request.args.get('file').isdigit() else 0 #if file=<value> in URL then read file number	
+	files = self.get_files()
+
+	try:
+		#get filename or thumbnail filename if URL contains thumb argument
+		filename = files[filenum] if not 'thumb' in request.args else os.path.join(os.path.dirname(files[filenum]), self.__THUMB_NAME + '/', self.__THUMB_NAME + os.path.basename(files[filenum]))
+	except Exception:
+		pass
+	return send_file(filename, mimetype=constants.EXTENSION_TO_TYPE[str(filename).rsplit('.')[-1].lower()]) if filename else 'No Photo!' #send file if exists and message if doesn't
+
+#method that adds new API method
+def extend_api (self, webmgr, usersmgr, backend):
+	return [ webmgr.site_bind('/api/get_sync_image', self.get_sync_image) ] #bind API method with URL
+```
+
+* ```get_files``` is a helper method that returns list of synced photo paths for the configured ```local_path``` property
+* ```@login_required``` is a decorator that determines if this function needs user to logged in to visit website. If not added then anyone even non-authorized users can access it
+* ```get_sync_image``` method retrieves ```filenum``` - index of desired photo from ```request.args``` passed to URL like ```http://<IP>/api/get_sync_image?file=1```
+* ```filenum``` index is used to get the file from ```files``` - list of photos and if request contains ```thumb``` argument then it takes the file from thumbnail folder and filename with thumbnail prefix. Thumbnail request argument is passed like this: ```http://<IP>/api/get_sync_image?file=1&thumb=```
+* method returns file with its MIME type or error text if any occurs
+
+The results look like this:
+<div align="center">
+
+|<img src ="https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/assets/apiphoto.png" width="400"/>| 
+|:--:| 
+|*Photo returned by API by URL with photo index argument*|
+
+|<img src ="https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/assets/apithumb.png" width="400"/>| 
+|:--:| 
+|*Photo thumbnail returned by API by URL with photo index argument and thumbnail flag*|
+
+|<img src ="https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/assets/apierror.png" width="400"/>| 
+|:--:| 
+|*API error for retriving the photo index out of files list range*|
+</div>
+
 ### Step 6: Adding website
 
 *Plugin will add the website to ePiframe WebUI to present the gathered photos (with use of API function stated above)*
