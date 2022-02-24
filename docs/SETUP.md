@@ -443,32 +443,32 @@ Files structure :
 Inside plugin path create file _<website_name>.py_ with:
 
 ```
-	from flask import Blueprint, render_template
-	from flask_login import login_required	
-	<website_name>_bp = Blueprint('<website_name>_bp', __name__,  template_folder='templates', static_folder='static' )
-	@<website_name>_bp.route('/test') #this is the URL of the site
-	@login_required #user login is needed to visit. The order matters so this decorator should be the last one before method.
-	def view():    
-		return render_template('test.html', text='This text will be passed!')
+from flask import Blueprint, render_template
+from flask_login import login_required	
+<website_name>_bp = Blueprint('<website_name>_bp', __name__,  template_folder='templates', static_folder='static' )
+@<website_name>_bp.route('/test') #this is the URL of the site
+@login_required #user login is needed to visit. The order matters so this decorator should be the last one before method.
+def view():    
+	return render_template('test.html', text='This text will be passed!')
 ```
 		
 Inside plugin templates folder create file test.html with:
 
 ```
-	{% extends "layout.html" %} <!-- This will load ePiframe template, jQuery and Bootstrap -->
-	{% block title %}Test{% endblock %}
-	{% block head %}
-	  {{ super() }}
-	  <!-- Load static resources -->
-	{% endblock %}
-	{% block content %}
-	   <!-- Content -->
-		<p>{{ text }}</p>
-	   <script>
-	   	//Scripts
-			$(".test-menu").addClass("link-light"); //Light up website link in menu
-	   </script>
-	{% endblock %}	
+{% extends "layout.html" %} <!-- This will load ePiframe template, jQuery and Bootstrap -->
+{% block title %}Test{% endblock %}
+{% block head %}
+  {{ super() }}
+  <!-- Load static resources -->
+{% endblock %}
+{% block content %}
+   <!-- Content -->
+	<p>{{ text }}</p>
+   <script>
+	//Scripts
+		$(".test-menu").addClass("link-light"); //Light up website link in menu
+   </script>
+{% endblock %}	
 ```
 
 References:

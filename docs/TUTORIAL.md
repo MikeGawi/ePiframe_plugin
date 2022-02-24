@@ -479,7 +479,7 @@ def extend_api (self, webmgr, usersmgr, backend):
 ```
 
 * ```get_files``` is a helper method that returns list of synced photo paths for the configured ```local_path``` property
-* ```@login_required``` is a decorator that determines if this function needs user to logged in to visit website. If not added then anyone even non-authorized users can access it
+* ```@login_required``` is a decorator that determines if this function needs user to be logged in to visit website. If not added then anyone, even non-authorized users can access it
 * ```get_sync_image``` method retrieves ```filenum``` - index of desired photo from ```request.args``` passed to URL like ```http://<IP>/api/get_sync_image?file=1```
 * ```filenum``` index is used to get the file from ```files``` - list of photos and if request contains ```thumb``` argument then it takes the file from thumbnail folder and filename with thumbnail prefix. Thumbnail request argument is passed like this: ```http://<IP>/api/get_sync_image?file=1&thumb=```
 * method returns file with its MIME type or error text if any occurs
@@ -503,6 +503,165 @@ The results look like this:
 ### Step 6: Adding website
 
 *Plugin will add the website to ePiframe WebUI to present the gathered photos (with use of API function stated above)*
+
+We have almost everything on place: photos synced to a local storage, generated photos thumbnails and API methods to simply display them. Now it's time to create a new ePiframe website that presents what we did by now. 
+
+The sites are created with [Flask Blueprints](https://flask.palletsprojects.com/en/2.0.x/blueprints/) and it is possible to use ePiframe template with embedded jQuery and Bootstrap 5 that makes them very functional and beautiful. 
+
+Plugin base class method to overwrite is [```add_website```](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#adding-new-websites-and-menu-entries) and for new menu entries (optional) list of ```webmgr.menu_entry``` from passed [WebUI Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/webuimanager.py) objects is used, possible fields: ```name```, ```url```, ```id```, ```icon```. ```name``` is the name of the menu entry to appear (e.g. "Show graph"), ```url``` is the link path e.g. "/test", ```id``` is the element ID to find it with javascript and for example change styling when active. ```icon``` should be taken from [Boostrap Icons](https://icons.getbootstrap.com/), e.g. "bi bi-alarm".
+
+This process is more complex than previous ones as it needs more files to create and more than Python knowledge.
+
+Inside plugin path let's create folders: _templates_ (for website templates) and _static_ (for static content, scripts, styles, etc.). File *show.py* should be created along with plugin *_plugin.py* file and *show.html* in *templates* folder.
+
+Files structure :
+```
+├── _plugin.py
+├── show.py
+├── static
+│   └── images
+│       └── watermark.png
+└── templates
+    └── show.html
+```
+
+Overwritten plugin base method will be very simple to implement:
+```
+def add_website (self, webmgr, usersmgr, backend):
+	from plugins.ePiSync.show import show #import site
+	webmgr.add_menu_entries([ webmgr.menu_entry ('ePiSync', '/episync', 'episync-menu', 'bi bi-image') ]) #create menu entry with name, URL, menu id and icon
+	site = show(self) #create site class and pass plugin
+	return [ site.get_show_bp() ] #return list of websites to add
+```
+
+* ```from plugins.ePiSync.show import show``` imports the *show.py* files Flask Blueprint of the website we're adding
+* ```webmgr.add_menu_entries``` methods add menu entries to ePiframe WebUI menu (more than one are allowed)
+* ```webmgr.menu_entry ('ePiSync', '/episync', 'episync-menu', 'bi bi-image')``` is a menu entry that name is *ePisync*, takes to ```/episync``` URL, menu ID is *episync-menu* and icon is [```bi bi image```](https://icons.getbootstrap.com/icons/image/)
+* ```site``` is a show object that is passing plugin class to constructor
+* method returns list of added websites (more than one allowed)
+
+Now let's create a Blueprint of our ePisync website. In file *show.py* let's add code:
+```
+from flask import Blueprint, render_template
+from flask_login import login_required	
+
+class show():
+	
+	#constructor to pass plugin class
+	def __init__(self, plugin):
+		self.plugin = plugin
+	
+	#returns generated blueprint website with injected plugin class
+	def get_show_bp(self):	
+		show_bp = Blueprint('show_bp', __name__,  template_folder='templates', static_folder='static' )
+
+		@show_bp.route('/episync') #this is the URL of the site
+		@login_required #user login is needed to visit.
+		def show():    
+			return render_template('show.html', number=len(self.plugin.get_files()), width=self.plugin.config.get('thumb_width'), height=self.plugin.config.get('thumb_height'))
+		
+		return show_bp
+```
+
+* class ```show``` is a helping class that generates Blueprint and injects plugin class
+* plugin class is injected in the constructor
+* ```get_show_bp``` returns dynamically created website Blueprint with rendering method and URL binding
+* ```show_bp``` is a website Blueprint object that will be recognized for Flask under *show_bp* name, has templates and static folders configured to the ones we've created
+* ```@show_bp.route('/episync')``` is the route to our website (notice the Blueprint object name decorator at the beginning). ```http://<IP>/episync``` will be an URL for our website
+* ```@login_required``` decorator determines if website needs an user to be logged in to visit it. This decorator should be the last one just above the method name and can be removed so everyone can visit this site, even not authenticated users
+* ```def show()``` is a website rendering method that is executed when bounded address is visited. 
+* ```return render_template``` returns website template *show.html* that is in configured *templates* folder and passes values with names ```number```, ```width``` and ```height``` to the template. These names are arbitrary as are just the identifier inside the template
+* ```number=len(self.plugin.get_files())``` will be a number of synced files with use of our helping method from [Step 5: Extending API](#step-5-extending-api)
+* ```width=self.plugin.config.get('thumb_width')``` and ```height=self.plugin.config.get('thumb_height')``` will have plugin configuration passed values
+
+You probably wonder why this website is created in such tricky way, that's because we want to inject plugin class to use it inside the template and generating it inside a method that dynamically joins all elements is a good way to do that.
+
+To summarize what we did so far:
+* we've created a file structure to hold templates and Blueprint resources to generate a new webiste
+* by overwriting plugin base class ```add_website``` method we've added new menu entry that will be visible on ePiframe website and pointed our new website Blueprint to be the target site for it
+* we've created a generating class ```show``` in *show.py* file that is joining plugin class with website template and creates Blueprint object, binds website URL and injects values to template renderer so plugin variables can be used in template
+
+The last step is to create the template itself. It needs some basic knowledge of Jinja, HTML, Javascript, Bootstrap 5 and jQuery but it's way more simple than it sounds. First, let's gather some elements that can help us.
+
+Our site name will be *ePisync show*. It should have the template of ePiframe to not stand out as we want it to be a part of ePiframe. It will show the synced photos thumbnails in a dynamic table that is responsive for the display that it works on and should be adapting to mobile view. Photo should be enlarged when clicked on.
+
+Let's check a ready template schema in Jinja for such site:
+```
+{% extends "layout.html" %} <!-- This will load ePiframe template, jQuery and Bootstrap -->
+{% block title %}<SITE_NAME>{% endblock %}
+{% block head %}
+  {{ super() }} <!-- Load static resources -->
+{% endblock %}
+{% block content %}
+   	<!-- Content -->
+	...
+	<script>
+	//Scripts
+		$(".<MENU_NAME>").addClass("link-light"); //Light up website link in menu
+   </script>
+{% endblock %}	
+```
+
+* ```extends "layout.html"``` is a code that will use ePiframe template for the site and will load jQuery, Bootstrap and more
+* ```block title``` is a website name block
+* ```block head``` is an HTML head block to load initial scripts and resources. ```super()``` will load ePiframe resources
+* ```block content``` is a website content part to put HTML
+* ```<script>``` is a place to put scripts in
+* ```$(".<MENU_NAME>").addClass("link-light");``` will light up the website link in the ePiframe website menu. That's why we need menu entry id in the code that adds it
+
+With that template and [Bootstrap 5 documentation](https://getbootstrap.com/docs/5.0/getting-started/introduction/) we can slowly create our view.
+
+First let's create a container with photos - our elements. Quick look in the documentation and we find [grid](https://getbootstrap.com/docs/5.0/layout/grid/) that allows to have rows and columns that dynamically adjust to view size. 
+
+Elements to close to each other? Look at [spacing](https://getbootstrap.com/docs/5.0/utilities/spacing/). [Borders](https://getbootstrap.com/docs/5.0/utilities/borders/), even with rounded corners? [Tooltips](https://getbootstrap.com/docs/5.0/components/tooltips/)? Predefined [colors](https://getbootstrap.com/docs/5.0/customize/color/) that suit with each other? Bootstrap have it all, well documented and with examples.
+
+With that, some time, patience and many trials and errors we get this:
+```
+{% extends "layout.html" %} <!-- This will load ePiframe template, jQuery and Bootstrap -->
+{% block title %}ePiSync show{% endblock %}  <!-- Site title -->
+{% block head %}
+  {{ super() }}  <!-- Load all parent scripts -->
+{% endblock %}
+{% block content %}
+   <!-- Content -->
+		<div class="container">
+		  <h3 class="pt-2"> ePiSync Images: </h3>
+		  <div class="row row-cols-auto p-4">
+			{% for file in range(number) %}  <!-- Loop through file indices -->
+			<div class="col-auto p-2">
+				<div class="row px-0 col-auto mx-auto border border-4 rounded-3" >
+					<a href="{{ url_for('get_sync_image') }}?file={{ file }}" target="_blank" data-bs-toggle="tooltip" title="Click to view image" class="px-0" data-bs-placement="top" style="height: {{ height }}px; width: {{ width }}px;">
+						<img src="{{ url_for('get_sync_image') }}?thumb=&file={{ file }}" alt="No Photo!" width="{{ width }}" height="{{ height }}"/>
+					</a>
+				</div>					
+			</div>
+			{% endfor %}
+		  </div>
+		</div>
+   <script>
+		//Scripts
+		//Show tooltips
+		$('document').ready(function(){
+			$('[data-bs-toggle=tooltip]').tooltip();
+		});
+		
+		$(".episync-menu").addClass("link-light"); //Light up website link in menu
+   </script>
+{% endblock %}
+```
+
+* ```{% for file in range(number) %}...{% endfor %}``` is a Jinja loop that assings value from 0 to ```number``` range to a ```file``` variable in cycles. With that code inside this loop is generated ```number``` of times with different ```file``` input
+* photo will be a hyperlink - ```<a href...``` that has an embedded image - ```<img...``` that is in a ```div``` with rounded corners as a border
+* photo hyperlink will take us to a website - API method with different file index as URL request argument. Notice that URL is specified with method name (```<a href="{{ url_for('get_sync_image') }}?file={{ file }}"...```) inside Blueprint ```show``` class so even if binding is changed it will work as URL is not hardcoded. ```target="_blank"``` opens new web browser tab not closing the current one
+* photo image source is again taken from our new API method with thumbnail request argument that dynamically puts thumbnail to our photo hyperlink
+* notice that ```{{ height }}``` and ```{{ width }}``` values are passed here by template rendering method inside ```show``` class
+* ```$('document').ready(function(){...``` is a script that is used by Bootstrap to trigger tooltips and was taken from the [tooltips documentation](https://getbootstrap.com/docs/5.0/components/tooltips/)
+* ```$(".episync-menu").addClass("link-light");``` links up menu entry link with id ```episync-menu```
+
+The results look like this:
+<p align="center">
+	<img src ="https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/assets/website.png" width="400">
+</p>
 
 ### Step 7: Adding configuration
 
