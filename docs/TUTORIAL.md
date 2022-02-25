@@ -534,13 +534,13 @@ def add_website (self, webmgr, usersmgr, backend):
 	return [ site.get_show_bp() ] #return list of websites to add
 ```
 
-* ```from plugins.ePiSync.show import show``` imports the *show.py* files Flask Blueprint of the website we're adding
-* ```webmgr.add_menu_entries``` methods add menu entries to ePiframe WebUI menu (more than one are allowed)
-* ```webmgr.menu_entry ('ePiSync', '/episync', 'episync-menu', 'bi bi-image')``` is a menu entry that name is *ePisync*, takes to ```/episync``` URL, menu ID is *episync-menu* and icon is [```bi bi image```](https://icons.getbootstrap.com/icons/image/)
-* ```site``` is a show object that is passing plugin class to constructor
+* ```from plugins.ePiSync.show import show``` imports the *show.py* file Flask Blueprint of the website we're adding
+* ```webmgr.add_menu_entries``` method add menu entries to ePiframe WebUI menu (more than one are allowed)
+* ```webmgr.menu_entry ('ePiSync', '/episync', 'episync-menu', 'bi bi-image')``` is a menu entry that name is *ePisync*, takes to ```/episync``` URL, menu ID is ```episync-menu``` and icon is [```bi bi image```](https://icons.getbootstrap.com/icons/image/)
+* ```site``` is a ```show``` object that is passing plugin class to constructor
 * method returns list of added websites (more than one allowed)
 
-Now let's create a Blueprint of our ePisync website. In file *show.py* let's add code:
+Now let's create a Blueprint of our ePisync website. *show.py* file code:
 ```
 from flask import Blueprint, render_template
 from flask_login import login_required	
@@ -615,7 +615,7 @@ First let's create a container with photos - our elements. Quick look in the doc
 
 Elements to close to each other? Look at [spacing](https://getbootstrap.com/docs/5.0/utilities/spacing/). [Borders](https://getbootstrap.com/docs/5.0/utilities/borders/), even with rounded corners? [Tooltips](https://getbootstrap.com/docs/5.0/components/tooltips/)? Predefined [colors](https://getbootstrap.com/docs/5.0/customize/color/) that suit with each other? Bootstrap have it all, well documented and with examples.
 
-With that, some time, patience and many trials and errors we get this:
+With that, some time, patience and many trials and errors we get this *show.html* code:
 ```
 {% extends "layout.html" %} <!-- This will load ePiframe template, jQuery and Bootstrap -->
 {% block title %}ePiSync show{% endblock %}  <!-- Site title -->
@@ -667,10 +667,159 @@ The results look like this:
 
 *Plugin will have configuration file that can be configured in CLI or WebUI, that validates entries and allows to customize its functionality*
 
+We're done with the plugin implementation but we've gathered some properties of the configuration that needs to be gathered, documented and prepared. 
+
+Configuration in ePiframe is very strict to validation, types, dependencies, etc. so the plugin should be the same. Settings are dynamically rendered in the WebUI according to the type thus some additional steps needs to be performed to get that right. There are two things to be done:
+* [Configuration class](#configuration-class)
+* [Configuration file](#configuration-file)
+
+The plugin configuration can be checked the same way as ePiframe configuration:
+
+```./ePiframe.py --check-config```
+
+All the plugins configurations will be checked as well.
+
+We've already got configuration class that we've built during the implementation and that is:
+
+```
+## Config manager class.
+class configmgr (configbase):
+	def load_settings(self):
+		self.SETTINGS = [
+			configprop('is_enabled', self, prop_type=configprop.BOOLEAN_TYPE), # this setting is required! 
+			#local path to sync to, notice that convert method is used to pass value to the create_dir method that creates the path if not exists
+			#that's just a tricky way to use convert
+			configprop('local_path', self, prop_type=configprop.FILE_TYPE, dependency='is_enabled', convert=localsourcemanager.create_dir),
+			configprop('remote_path', self, dependency='is_enabled'), #this is string (by default)
+			configprop('remote_host', self, dependency='is_enabled'), #all are dependent to is_enabled
+			configprop('remote_user', self, dependency='is_enabled'), #and will be enabled only if is_enabled is true
+			configprop('sync_timeout', self, minvalue=2, maxvalue=10, prop_type=configprop.INTEGER_TYPE, dependency='is_enabled'), #integer values with min and max thresholds
+			configprop('thumb_width', self, minvalue=100, maxvalue=400, prop_type=configprop.INTEGER_TYPE, dependency='is_enabled'),
+			configprop('thumb_height', self, minvalue=100, maxvalue=300, prop_type=configprop.INTEGER_TYPE, dependency='is_enabled')
+		]
+## End of configmgr class.
+```
+
+This list contains all customizable configuration properties with information on how to render it, validate, treat and process. Now we need to create conifguration file that can be set in CLI and ePiframe WebUI as well.
+
+Let's create _<plugin_name>/default/config.default_ according to added settings and copy it to _<plugin_name>/config.cfg_ file (default file is used to restore default values the other one is used for the configuration).
+
+Initially *config.cfg* and *config.default* should be the same. 
+
+ePiframe *cfg* files have some syntax to make process easier:
+* ```'; <text>'```- non processed comment that won't be visible only in file and not in WebUI
+* ```'# <text>'```- processed comment that will be visible in file and in WebUI. Every line abowe the property is concatenated into one text
+* ```[<Section name>]``` - section used to divide entries into groups
+* ```<entry name>=<value>``` - configuration property (unique within whole file) should not contain spaces or special characters and should be followed by = and a value (empty value is also possible)
+
+Examples of entries:
+```
+my_ip=127.0.0.1
+name=ePiframe
+size=120
+bool_value=0
+empty_value=
+list_value=2,3,2,1,2,3,4,3
+path=logs/ePiframe.log
+```
+
+For more examples check [ePiframe config.cfg file](https://github.com/MikeGawi/ePiframe/blob/master/config.cfg)
+
+So let's create _ePisync/default/config.default_ file for the plugin:
+```
+[General]
+
+# Set 1 to enable plugin, 0 to disable.
+# Default: 0 (disabled)
+is_enabled=0
+
+# Path to sync the photos to.
+# Default: synced_photos
+local_path=synced_photos
+
+# Remote path to sync the photos from.
+# Default: empty
+remote_path=
+
+# Remote host to sync the photos from.
+# IP or hostname.
+# Default: empty
+remote_host=
+
+# Remote user to sync the photos with.
+# Default: empty
+remote_user=
+
+# Sync timeout.
+# Value between 2 and 10.
+# Default: 5
+sync_timeout=5
+
+# Thumbnail width in pixels.
+# Value between 100 and 400.
+# Default: 200
+thumb_width=200
+
+# Thumbnail height in pixels.
+# Value between 100 and 300.
+# Default: 120
+thumb_height=120
+```
+
+* section name is *General*
+* notice that boolean property *is_enabled* value is 0 or 1
+* *local_path* is a string that represents a path
+* *remote_path* has no value
+* notice integer properties that have initial value
+
+Now we should copy 1:1 the file to  _ePisync/config.cfg_, because _ePisync/default/config.default_ file is used to restore default properties values and should not change and the file _ePisync/config.cfg_ is used to be changed by the user for plugin customization.
+
+The configuration class and the configuration file will be rendered in ePiframe *Plugins* menu like this:
+<p align="center">
+	<img src ="https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/assets/config.png" width="400">
+</p>
+
 ## Finishing touches
+
+As we've finished whole plugin implementation we should test it very deeply. During tests we should remember that:
+* ePiframe works well with high quality HDMI displays and with e-Paper displays with limitted color palette and size
+* frame can be standing horizontally or vertically
+* ePiframe works usually on Raspberry Pi Zero which needs a well optimized code and resources-wise code
+* frame can be triggered from WebUI, Telegram Bot, CLI and ePiframe service
+* there may be other plugins working on this frame
+* configuration after plugin update should be reverse compatible (use properties conversion, special handling and legacy convert - [Configuration class](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#configuration-class)
+
+With these hints you can plan testing scenarios and make sure that plugin works fine.
+
+ePiframe [command line](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line) can be helpful to test every aspect of the implementation.
 
 ### Documentation and licensing
 
+Taken from the [ePiframe_plugin Documentation](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#configuration-class):
+>* Include screenshot of visual changes made by the plugin (if any)
+>* Add a short, one sentence, clear description what it does and put this data in the plugin class as well
+>* What external API's/sites/modules/projects it uses and if they have limitations or price
+>* Include a detailed installation instruction, what needs to be installed and configured
+
+There are some basic steps typical for the ePiframe infrastructure that are common for all plugins:
+* Clone/download/extract the plugin to _<ePiframe_path>/plugins/<plugin_name_folder>_
+* Configure plugin with _<ePiframe_path>/plugins/<plugin_name_folder>.config.cfg_ file or in ePiframe WebUI under _Plugins/<plugin_name>_
+* Check configuration in WebUI or with ```./ePiframe.py --check-config``` command
+
+Check [plugin examples](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#examples) for reference.
+
+Plugin should be well documented and have very detailed instruction how to use it, install and configure. The configuration properties should have clear descriptions and examples. There is nothing as much annoying as a plugin you've dreamed of and that is hard to get working.
+
+More on the plugin license can be found [here](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#license).
+
 ### Sharing the plugin
 
+After the implementation, testing, documentation and having fun there is time to share the plugin. There's something thrilling and fun when sharing your creation with the world and ePiframe would like to help with that:
+* Make your plugin repository public
+* Add plugin details in [the table](https://github.com/MikeGawi/ePiframe_plugin#plugins-list) and create a pull request - it will appear on the main site
+
 ## Final code and summary
+
+The final code created here can be found [here](https://github.com/MikeGawi/ePiframe_plugin/tree/master/docs/ePiSync_code_tutorial). 
+
+You could see all steps needed to create such complicated and crazy plugin. Creating plugins for ePiframe is not hard and could be a good start to have fun with Python by giving all posibilities, making hard things easier and give an opportunity. A good idea project can lead to a great scripting adventure, so have fun with it and wish all the best with reaching new goals. 

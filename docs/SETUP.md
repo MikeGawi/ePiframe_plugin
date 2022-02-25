@@ -49,7 +49,7 @@ Please follow these rules if you want to create your own plugin:
 * Inside ```_plugin.py``` file fill in the basic data like name, description, author, etc.
 * Start overriding methods that the plugin will use, use built-in modules or create new ones and have fun with it!
 * Create plugin configuration file
-* Test the plugin with ePiframe and put everything to the new GitHub project if all good
+* Test the plugin with ePiframe and put everything to the project if all good
 * Add plugin details in [the table](https://github.com/MikeGawi/ePiframe_plugin#plugins-list) and create a pull request - it will appear on the main site
 
 # Structure
@@ -725,6 +725,7 @@ __*NOTE:*__ Script will handle moving entries from one section to another as ent
 
 According to the [contribution statements](#contribution), plugin should precisely describe:
 > What external API's/sites/modules/projects it uses and if they have limitations or price
+
 > Include a detailed installation instruction, what needs to be installed and configured
 
 But there are some basic steps typical for the ePiframe infrastructure that are common for all plugins:
