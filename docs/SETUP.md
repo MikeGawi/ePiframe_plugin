@@ -584,7 +584,7 @@ The plugin configuration can be checked the same way as ePiframe configuration:
 
 ```./ePiframe.py --check-config```
 
-All the plugins configurations will be checked as well.
+All plugins configurations will be checked as well.
 
 __*NOTE:*__ Allow users to configure as much as possible options of the plugin, e.g. if plugin puts text somewhere, allow user to pick the position, color, font size, etc.
 __*NOTE:*__ Keep backward compatibility of the plugin configuration files, like ePiframe does, or indicate what needs to be changed manually to adapt the configuration to the newest plugin version after update

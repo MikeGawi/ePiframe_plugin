@@ -667,17 +667,17 @@ The results look like this:
 
 *Plugin will have configuration file that can be configured in CLI or WebUI, that validates entries and allows to customize its functionality*
 
-We're done with the plugin implementation but we've gathered some properties of the configuration that needs to be gathered, documented and prepared. 
+We're done with the plugin implementation but we've gathered some properties of the configuration that needs to be documented and prepared. 
 
 Configuration in ePiframe is very strict to validation, types, dependencies, etc. so the plugin should be the same. Settings are dynamically rendered in the WebUI according to the type thus some additional steps needs to be performed to get that right. There are two things to be done:
-* [Configuration class](#configuration-class)
-* [Configuration file](#configuration-file)
+* [Configuration class](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#configuration-class)
+* [Configuration file](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#configuration-file)
 
 The plugin configuration can be checked the same way as ePiframe configuration:
 
 ```./ePiframe.py --check-config```
 
-All the plugins configurations will be checked as well.
+All plugins configurations will be checked as well.
 
 We've already got configuration class that we've built during the implementation and that is:
 
@@ -707,8 +707,8 @@ Let's create _<plugin_name>/default/config.default_ according to added settings 
 Initially *config.cfg* and *config.default* should be the same. 
 
 ePiframe *cfg* files have some syntax to make process easier:
-* ```'; <text>'```- non processed comment that won't be visible only in file and not in WebUI
-* ```'# <text>'```- processed comment that will be visible in file and in WebUI. Every line abowe the property is concatenated into one text
+* ```'; <text>'```- non processed comment that will be visible only in file and not in WebUI
+* ```'# <text>'```- processed comment that will be visible in file and in WebUI. Every line above the property is concatenated into one text
 * ```[<Section name>]``` - section used to divide entries into groups
 * ```<entry name>=<value>``` - configuration property (unique within whole file) should not contain spaces or special characters and should be followed by = and a value (empty value is also possible)
 
@@ -787,15 +787,15 @@ As we've finished whole plugin implementation we should test it very deeply. Dur
 * ePiframe works usually on Raspberry Pi Zero which needs a well optimized code and resources-wise code
 * frame can be triggered from WebUI, Telegram Bot, CLI and ePiframe service
 * there may be other plugins working on this frame
-* configuration after plugin update should be reverse compatible (use properties conversion, special handling and legacy convert - [Configuration class](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#configuration-class)
+* configuration after plugin update should be reverse compatible (use properties conversion, special handling and legacy convert - [Configuration class](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#configuration-class))
 
-With these hints you can plan testing scenarios and make sure that plugin works fine.
+With these hints you can plan testing scenarios and make sure that plugin works fine in every situation.
 
 ePiframe [command line](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line) can be helpful to test every aspect of the implementation.
 
 ### Documentation and licensing
 
-Taken from the [ePiframe_plugin Documentation](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#configuration-class):
+Taken from the [ePiframe_plugin Documentation](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#contribution):
 >* Include screenshot of visual changes made by the plugin (if any)
 >* Add a short, one sentence, clear description what it does and put this data in the plugin class as well
 >* What external API's/sites/modules/projects it uses and if they have limitations or price
@@ -820,6 +820,6 @@ After the implementation, testing, documentation and having fun there is time to
 
 ## Final code and summary
 
-The final code created here can be found [here](https://github.com/MikeGawi/ePiframe_plugin/tree/master/docs/ePiSync_code_tutorial). 
+The final code created in this tutorial can be found [here](https://github.com/MikeGawi/ePiframe_plugin/tree/master/docs/ePiSync_code_tutorial). 
 
-You could see all steps needed to create such complicated and crazy plugin. Creating plugins for ePiframe is not hard and could be a good start to have fun with Python by giving all posibilities, making hard things easier and give an opportunity. A good idea project can lead to a great scripting adventure, so have fun with it and wish all the best with reaching new goals. 
+You could see all steps needed to create such complicated and crazy plugin. Creating plugins for ePiframe is not hard and could be a good start to have fun with Python by giving all posibilities, making hard things easier and give an opportunity. A good project idea can lead to a great scripting adventure, so have fun with it and all the best with reaching new goals! 
