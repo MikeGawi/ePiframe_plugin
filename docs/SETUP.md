@@ -744,8 +744,8 @@ With these hints you can plan testing scenarios and make sure that plugin works 
 # Plugin installation
 
 According to the [contribution statements](#contribution), plugin should precisely describe:
-> * What external API's/sites/modules/projects it uses and if they have limitations or price
-> * Include a detailed installation instruction, what needs to be installed and configured
+>* What external API's/sites/modules/projects it uses and if they have limitations or price
+>* Include a detailed installation instruction, what needs to be installed and configured
 
 But there are some basic steps typical for the ePiframe infrastructure that are common for all plugins:
 * Clone/download/extract the plugin to _<ePiframe_path>/plugins/<plugin_name_folder>_
