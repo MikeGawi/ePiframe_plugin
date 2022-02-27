@@ -22,6 +22,7 @@
    * [Creating configuration](#creating-configuration)
       * [Configuration class](#configuration-class)
       * [Configuration file](#configuration-file)
+   * [Testing](#testing)
    * [Plugin installation](#plugin-installation)
    * [Examples](#examples)
    * [License](#license)
@@ -720,6 +721,25 @@ References:
 __*NOTE:*__ After updating/changing default configuration file with new entries, the new ones, that doesn't exists in *config.cfg* file, will be moved there with default values.
 
 __*NOTE:*__ Script will handle moving entries from one section to another as entries are recognized by name not the section and name.
+
+# Testing
+
+The plugin should be deeply tested before release as it can harm a working ePiframe. 
+
+Plugin should be installed in <*ePiframe root path*>*/plugins/*<*plugin_name*> path and you can just put it there to make tests easier but remember to [stop the service](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#service-control) to not interfere working frame.
+
+ePiframe [can be installed](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#manual) also on non-Pi architectures and to avoid Pi system check just run ePiframe with ```--test``` flag from CLI, i.e. ```./ePiframe.py --test```. Running WebUI and other services is possible with [other commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line).
+
+Remember that:
+* ePiframe works well with high quality HDMI displays and with e-Paper displays with limitted color palette and size
+* frame can be standing horizontally or vertically
+* ePiframe works usually on Raspberry Pi Zero which needs a well optimized code and resources-wise code
+* frame can be triggered from WebUI, Telegram Bot, CLI and ePiframe service
+* keep in mind that WebUI has dark theme mode so if the plugin uses custom color outside the Bootstrap colors schema it can not work in this mode
+* there may be other plugins working on this frame
+* configuration after plugin update should be reverse compatible (use properties conversion, special handling and legacy convert - [Configuration class](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#configuration-class))
+
+With these hints you can plan testing scenarios and make sure that plugin works fine in every situation.
 
 # Plugin installation
 

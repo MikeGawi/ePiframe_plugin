@@ -786,6 +786,7 @@ As we've finished whole plugin implementation we should test it very deeply. Dur
 * frame can be standing horizontally or vertically
 * ePiframe works usually on Raspberry Pi Zero which needs a well optimized code and resources-wise code
 * frame can be triggered from WebUI, Telegram Bot, CLI and ePiframe service
+* keep in mind that WebUI has dark theme mode so if the plugin uses custom color outside the Bootstrap colors schema it can not work in this mode
 * there may be other plugins working on this frame
 * configuration after plugin update should be reverse compatible (use properties conversion, special handling and legacy convert - [Configuration class](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#configuration-class))
 
