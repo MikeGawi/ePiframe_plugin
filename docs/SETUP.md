@@ -34,13 +34,13 @@
 Please follow these rules if you want to create your own plugin:
 * Include screenshot of visual changes made by the plugin (if any)
 * Add a short, one sentence, clear description what it does and put this data in the plugin class as well
-* What external API's/sites/modules/projects it uses and if they have limitations or price
+* Add what external API's/sites/modules/projects it uses and if they have limitations or price
 * Include a detailed installation instruction, what needs to be installed and configured
 * Add plugin details in [this table](https://github.com/MikeGawi/ePiframe_plugin#plugins-list) and create a pull request
 
 ## Additional hints
 
-* Keep in mind that most ePiframes work on Raspberry Pi Zero, so include information about what hardware is needed if this setup is not enough
+* Keep in mind that most ePiframes work on Raspberry Pi Zero, so include information what hardware is needed if this setup is not enough
 * Allow users to configure as much as possible options of the plugin, e.g. if plugin puts text somewhere, allow user to pick the position, color, font size, etc.
 * Keep backward compatibility of the plugin configuration files, like ePiframe does, or indicate what needs to be changed manually to adapt the configuration to the newest plugin version after update
 
@@ -189,12 +189,12 @@ __*NOTE:*__ Creation time must be in _YYYY-mm-ddTHH:MM:SSZ_, i.e. 2021-01-27T22:
 	|```idlabel```|photo ID label name|
 	|```creationlabel```|photo creation time label name|
 	|```sourcelabel```|photo source label name|
-* **Returns:** photo final path + filename, best if it would contain an extension
+* **Returns:** photo final path + filename, best if it contains an extension
 * **Current functionality of ePiframe:** downloading selected photo from Google Photos and/or copying from local storage
 
-This method is optional and if not overriden, the standard copy from photo id (as a source location) to filename method will be used, extension will be added automatically. Alos, it will be executed only if the photo that has been picked up is from the source collected in ```add_photo_source``` method and identified by ```self.SOURCE``` value.
+This method is optional and if not overriden, the standard copy from photo id (as a source location) to filename method will be used, extension will be added automatically. Also, it will be executed only if the photo that has been picked up is from the source collected in ```add_photo_source``` method and identified by ```self.SOURCE``` value.
 
-ePiframe works only on the list of photos information not on files as it would be resources consuming. The only file that it works on is the one that is processed and displayed on frame. This method is used to download or get the file that has been picked from the list by ePiframe. If the source is for example a hosting site then it needs a method to download it, authenticate, pass key, etc. and should do that with ID that is passed in the Pandas row. 
+ePiframe works only on the list of photos information not on files as it would be consuming for resources. The only file that it works on is the one that is processed and displayed on frame. This method is used to download or get the file that has been picked from the list by ePiframe. If the source is for example a hosting site then it needs a method to download it, authenticate, pass key, etc. and should do that with ID that is passed in the Pandas row. 
 
 Examples:
 
@@ -276,7 +276,7 @@ __*NOTE:*__ It's good to reset the records indexing after sorting with ```photom
 	|```idlabel```|photo ID label name|
 	|```creationlabel```|photo creation time label name|
 	|```sourcelabel```|photo source label name|
-* **Returns:** photo final filename, best if it would contain an extension
+* **Returns:** photo final filename, best if it contains an extension
 * **Returns:**  _nothing_. This method should save modified photo as ```orgphoto``` name passed to it
 * **Current functionality of ePiframe:** there is no photo preprocessing
 
@@ -617,7 +617,7 @@ Possible ```misc.configprop``` properties and methods passed in constructor:
 |```resetneeded```|```None```|Flag to display "Reset needed after changing this property" alert in WebUI. Used to service related properties|
 |```convert```|```None```|Method to convert value property to another value. More on that below|
 
-```dependency``` is a structure that can be defined in two ways: by the name of the property that should enable child property (e.g. ```"dependency='is_function_enabled'"``` - that will check if boolean of ```is_function_enabled``` value is ```True``` and enable dependent property) or a name of the parent entry and the value for more complicated checks, e.g. ```dependency=['display_type', displaymanager.get_spi()]``` (or ```dependency=['size', 90]```), the value of property ```'display_type'``` will compared to ```displaymanager.get_spi()``` method result and will return ```True``` if the value is right, only then the children entries will be enabled as well.
+```dependency``` is a structure that can be defined in two ways: by the name of the property that should enable child property (e.g. ```"dependency='is_function_enabled'"``` - that will check if boolean of ```is_function_enabled``` value is ```True``` and enable dependent property) or a name of the parent entry and the value for more complicated checks, e.g. ```dependency=['display_type', displaymanager.get_spi()]``` (or ```dependency=['size', 90]```), the value of property ```'display_type'``` will be compared to ```displaymanager.get_spi()``` method result and will return ```True``` if the value is right, only then the children entries will be enabled as well.
 
 ```special``` is defined as a method that gets two variables: check function and the list of properties that are dependent with each other, e.g. ```special=configprop.special(filteringmanager.verify_times, ['photos_from', 'photos_to'])```. The check function gets the list of properties values and should return ```True``` if the dependencies are met, e.g. check the start time and end time, end time shouldn't be before start time, so check function checks both values for that.
 
@@ -718,7 +718,7 @@ is_enabled=1
 References:
 * [ePiframe config.cfg file](https://github.com/MikeGawi/ePiframe/blob/master/config.cfg)
 
-__*NOTE:*__ After updating/changing default configuration file with new entries, the new ones, that doesn't exists in *config.cfg* file, will be moved there with default values.
+__*NOTE:*__ After updating/changing default configuration file with new entries, the new ones, that doesn't exist in *config.cfg* file, will be moved there with default values.
 
 __*NOTE:*__ Script will handle moving entries from one section to another as entries are recognized by name not the section and name.
 
