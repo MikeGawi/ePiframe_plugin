@@ -15,7 +15,7 @@ Let's consider a plugin with functions:
 
 ## Prerequisites
 
-Of course you already have a working ePiframe and all dependencies installed so the most important thing now to start with is... the name for your project. It is really nice to have it before starting anything as it will help with the flow and all the thoughs will have a name under them. At some point ePiframe had a working name *GoopheePi* (Google Photos ePaper Pi) but later, after adding new functions I thought that with e-Paper display it looks *epic* so it was changed to *ePiframe*. The only limitation for the name is to not use dots and dashes as that will disturb ePiframe plugin recognition mechanism.
+Of course you already have a working ePiframe and all dependencies installed so the most important thing now to start with is... the name of your project. It is really nice to have it before starting anything as it will help with the flow and all the thoughs will have a name under them. At some point ePiframe had a working name *GoopheePi* (Google Photos ePaper Pi) but later, after adding new functions I thought that with e-Paper display it looks *epic* so it was changed to *ePiframe*. The only limitation for the name is not to use dots and dashes as that will disturb ePiframe plugin recognition mechanism.
 
 Let's name this plugin *ePiSync* to stick to ePiframe name and emphasize sync function.
 
@@ -38,7 +38,7 @@ info = 'All steps gathered here to create a multi-functional ePiframe plugin'
 
 Next thing is to gather all needed components. In case of our plugin we need to have *rsync* installed. It is a standard component of the Raspberry Pi OS *BUT* it's better to mention this in the plugin requirements and documentation. The rest is already embedded in ePiframe: Pillow for Python image processing, ImageMagick for command line image processing, Flask for API and website related things and Pandas for photo collection handling.
 
-If there are more prerequisites needed for your plugin, i.e. external API's, sites, modules, projects - mention in the documentation how to install/configure them and if they have limitations or price.
+If there are more prerequisites needed for your plugin, i.e. external API's, sites, modules, projects - mention in the documentation how to install/configure them and whether they have limitations or price.
 
 Let's install rsync:
 ```
@@ -48,9 +48,9 @@ sudo apt install rsync
 
 ## Implementation
 
-Plugin will be installed in <*ePiframe root path*>*/plugins/*<*plugin_name*> path and you can just put it there to make tests easier but remember to [stop the service](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#service-control) to not interfere working frame.
+Plugin will be installed in <*ePiframe root path*>*/plugins/*<*plugin_name*> path and you can just put it there to make tests easier but remember to [stop the service](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#service-control) so you don't interfere a working frame.
 
-ePiframe [can be installed](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#manual) also on non-Pi architectures and to avoid Pi system check just run ePiframe with ```--test``` flag from CLI, i.e. ```./ePiframe.py --test```. Running WebUI and other services is possible with [other commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line).
+ePiframe [can be installed](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#manual) also on non-Pi architectures and to avoid Pi system check, just run ePiframe with ```--test``` flag from CLI, i.e. ```./ePiframe.py --test```. Running WebUI and other services is possible with [other commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line).
 
 Plugins base class is embedded in the ePiframe code and the plugin class inherits exposed methods that can be overriden. The plugin manager inside ePiframe will run these methods in different phases of ePiframe runtime and will do that only if the method is used. 
 
@@ -58,7 +58,7 @@ The scope starts in the root folder of ePiframe so if some module needs to be us
 
 Most of the basic ePiframe modules that can be useful for particular plugins methods are passed during the run but all needed ePiframe ingredients can be imported if needed.
 
-If exception occurs during the run of overridden method (that stops the next steps of the plugin) an exception should be raised to be catched by the main script to be properly reported in logs.
+If exception occurs during the run of overridden method (that stops the next steps of the plugin) an exception should be raised to be caught by the main script to be properly reported in logs.
 
 Let's start with implementing steps needed by this plugin.
 
@@ -86,7 +86,7 @@ This is our public SSH key that can be placed on other hosts to give us access:
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLVDBIpdpfePg/a6h8au1HTKPPrg8wuTrjdh0QFVPpTI4KHctf6/FGg1NOgM++hrDlbrDVStKn/b3Mu65//tuvY5SG9sR4vrINCSQF++a+YRTGU6Sn4ltKpyj3usHERvBndtFXoDxsYKRCtPfgm1BGTBpoSl2A7lrwnmVSg+u11FOa1xSZ393aaBFDSeX8GlJf1SojWYIAbE25Xe3z5L232vZ5acC2PJkvKctzvUttJCP91gbNe5FSwDolE44diYbNYqEtvq2Jt8x45YzgFSVKf6ffnPwnUDwhtvc2f317TKx9l2Eq4aWqXTOMiPFA5ZRM/CF0IJCqeXG6s+qVfRjB pi@ePiframe
 ```
 
-Let's copy this key to clipboard, login to destination server (with the *USER* account that will be used for synchronization) and place this SSH key into *~/.ssh/authorized_keys* file. If the file doesn't exists, create it manually:
+Let's copy this key to clipboard, login to destination server (with the *USER* account that will be used for synchronization) and place this SSH key into *~/.ssh/authorized_keys* file. If the file doesn't exist, create it manually:
 ```
 mkdir ~/.ssh
 chmod 0700 ~/.ssh
@@ -119,7 +119,7 @@ class configmgr (configbase):
 				...
 ```
 
-to put the configuration entries to. This structure allows validation, type check, value check and lot more (WebUI rendering for example) of plugin settings. Let's put or new variables:
+to put the configuration entries to. This structure allows validation, type check, value check and lot more (WebUI rendering for example) of plugin settings. Let's put our new variables:
 ```
 ## Config manager class.
 class configmgr (configbase):
@@ -136,7 +136,7 @@ class configmgr (configbase):
 			...
 ```
 
-```local_path``` (DEST = destination of photos) is a file type property that existance will be checked during configuration loading. Here's a small trick: ```convert``` method used for converting value property to another value (it just passes the value to the method and returns new value) is used to create the directory if it's missing. It doesn't change the value as method is not returning new one. That's a trick to do something with the value before validation. The method ```create_dir``` is a part of [localsourcemanager](https://github.com/MikeGawi/ePiframe/blob/master/modules/localsourcemanager.py) module.
+```local_path``` (DEST = destination of photos) is a file type property whose existance will be checked during configuration loading. Here's a small trick: ```convert``` method used for converting value property to another value (it just passes the value to the method and returns new value) is used to create the directory if it's missing. It doesn't change the value as method is not returning new one. That's a trick to do something with the value before validation. The method ```create_dir``` is a part of [localsourcemanager](https://github.com/MikeGawi/ePiframe/blob/master/modules/localsourcemanager.py) module.
 
 Next properties: ```remote_path``` (SRC = remote host source path), ```remote_host``` (HOST = remote host IP or hostname) and ```remote_user``` (USER = remote host user used for sync) are string properties by default and will be checked if are not empty (by default).
 
@@ -184,13 +184,13 @@ This step may be hard to understand but let's shine some light on the situation:
 * Such amount of data needs a huge storage attached to Rasberry Pi
 * There may be some limitations on hosting site that can timeout or just hang the process
 
-Problematic, right? Especially when ePiframe works on Raspberry Pi Zero, so ePiframe just gathers the data (i.e. ID, creationtime, etc.) from this source, gets all needed parameters and works on the list. If it randomly picks the photo from this source *only then* downloads it and process. 
+Problematic, right? Especially when ePiframe works on Raspberry Pi Zero, so ePiframe just gathers the data (i.e. ID, creationtime, etc.) from this source, gets all needed parameters and works on the list. If it randomly picks the photo from this source *only then* downloads it and processes. 
 
 It works for Google Photos where there is a huge number of photos to download and we get only the one we want. For local storage source it's different because we already have photos on the storage and we just want to pick/copy the one we want to process and display on frame.
 
 This step should be number 3. as it's executed after [Step 3: Photo list](#step-3-photo-list) but let's keep it here to stay in the source context.
 
-The plugin base class method to overwrite is [```add_photo_source_get_file```](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#adding-new-photo-source-file-retrieving-method) and it should return photo final filename, best if it would contain an extension. 
+The plugin base class method to overwrite is [```add_photo_source_get_file```](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#adding-new-photo-source-file-retrieving-method) and it should return photo final filename, best if it contains an extension. 
 
 So this method should _retrieve the file_ and return the full path of the downloaded photo with extension. In the case of our plugin files are already in the local destination path so we need to recognize file type and copy it to target path for processing. As getting file extension is hard (some sources like Google Photos provide image [MIME type](https://en.wikipedia.org/wiki/MIME) that is indicating the right format) there are some ePiframe methods in [Convert Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/convertmanager.py) module to do that. 
 
@@ -216,7 +216,7 @@ def add_photo_source_get_file (self, photo, path, filename, idlabel, creationlab
 * ```constants.MIME_START``` is the MIME type string identifier used to create proper MIME from the ```imagetype``` returned by [Convert Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/convertmanager.py) module
 * ```filename_ret = os.path.join(path, filename_ret)``` joins path and final filename
 
-So we have now a final photo path with full destination filename. The last thing we need to do is copy the source file synced from remote location to ```filename_ret``` with *shutil*. The final code looks like this:
+So we have now a final photo path with full destination filename. The last thing we need to do is to copy the source file synced from remote location to ```filename_ret``` with *shutil*. The final code looks like this:
 ```	
 def add_photo_source_get_file (self, photo, path, filename, idlabel, creationlabel, sourcelabel, photomgr):
 	filename_ret = filename	
@@ -300,11 +300,11 @@ def change_photos_list (self, idlabel, creationlabel, sourcelabel, photo_list, p
 * ```size``` is a formatted string with width and height values taken from the plugin configuration
 * ```thumb_cmd``` is a string representing ImageMagick thumbnail generating command
 * ```rows``` are the Pandas rows from whole photos collection gathered from photos sources that will be filtered out by the source name, i.e. ```self.SOURCE``` set in [Step 1: Photo collecting](#step-1-photo-collection)
-* ```localsourcemanager.create_dir``` is a method of [localsourcemanager](https://github.com/MikeGawi/ePiframe/blob/master/modules/localsourcemanager.py) module to create a directory if it doesn't exists - thumbnail folder in that case
+* ```localsourcemanager.create_dir``` is a method of [localsourcemanager](https://github.com/MikeGawi/ePiframe/blob/master/modules/localsourcemanager.py) module to create a directory if it doesn't exist - thumbnail folder in that case
 * ```self.__THUMB_NAME``` is a prefix for thumbnail file and it is also used as a thumbnail folder name
 * ```for index, row in rows.iterrows():``` allows iteriting through Pandas rows and returns ```index, row``` in every loop cycle
 * ```thumb_file``` is generated from photo ID (source filename in this case) its path, filename and thumbnail idetifier prefix. It will be created in thumbnail folder
-* the thumbnail will be generated ONLY if it doesn't exists for the photo
+* the thumbnail will be generated ONLY if it doesn't exist for the photo
 * ```self.__subproc``` will execute ImageMagick command for every file and generate thumbnail, return output and error which will raise an exception if necessary
 * ```return photo_list``` is returning initial ```photo_list``` as nothing has changed
 
@@ -393,8 +393,8 @@ def postprocess_photo (self, finalphoto, width, height, is_horizontal, convertmg
 ```
 
 * this method is executed for every photo but with ```if self.SOURCE and not photo.empty and photo[sourcelabel] == self.SOURCE``` we determine that it will be done only for photos with the source like ```self.SOURCE```. Checking if ```photo``` is empty is because image pre/postprocessing may be also done manually from the [command line](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line) and in that case there is no photos Pandas collection
-* ```finalphoto``` is opened, rotated to an normal position (if vertical) and converted to RGBA (Red Green Blue + Alpha) as ```newimage```, to not supress any transparent areas of watermark. Old color mode is saved to ```mode```
-* watermark is opened to ```watermark```, also converted to RGBA mode, resized to 1/10 of a width and height of target photo and pasted on right-bottom position minus 10 pixels margin from right and bottom
+* ```finalphoto``` is open, rotated to an normal position (if vertical) and converted to RGBA (Red Green Blue + Alpha) as ```newimage```, to not supress any transparent areas of watermark. Old color mode is saved to ```mode```
+* watermark is open to ```watermark```, also converted to RGBA mode, resized to 1/10 of a width and height of target photo and pasted on right-bottom position minus 10 pixels margin from right and bottom
 * image is converted back to original color mode, rotated back to initial rotation and saved as input image
 
 The results look like this:
@@ -435,14 +435,14 @@ So back to our plugin: *API method should return a thumbnail and original photo*
 
 A good working reference would be ```get_image``` method in [WebUI Manager](https://github.com/MikeGawi/ePiframe/blob/eb3753684360848cc79278a45121879b5bd9ab0b/modules/webuimanager.py#L174) that is basically doing the same thing - it just uses Flask ```send_file``` method to expose file under URL.
 
-As our new URL will return only one file at once we need to allow to pick any file and have option to display full-sized photo or just a thumbnail. Every Flask bounded method get's a request that is passed to URL and it contains arguments. To get request argument we need to use ```request.args.get(<NAME>)``` and get the passed value with ```http://<URL>?<NAME>=<VALUE>&<NAME2>=<VALUE2>&...```. In our case we need to get index of the file and thumbnail flag. To have the list of synced files we can use [localsourcemanager](https://github.com/MikeGawi/ePiframe/blob/master/modules/localsourcemanager.py) and ```get.files()``` method as we did in [Step 1: Photo collecting](#step-1-photo-collection).
+As our new URL will return only one file at once we need to allow to pick any file and have option to display full-sized photo or just a thumbnail. Every Flask bounded method gets a request that is passed to URL and it contains arguments. To get request argument we need to use ```request.args.get(<NAME>)``` and get the passed value with ```http://<URL>?<NAME>=<VALUE>&<NAME2>=<VALUE2>&...```. In our case we need to get index of the file and thumbnail flag. To have the list of synced files we can use [localsourcemanager](https://github.com/MikeGawi/ePiframe/blob/master/modules/localsourcemanager.py) and ```get.files()``` method as we did in [Step 1: Photo collecting](#step-1-photo-collection).
 
 To get the files from configured path:
 ```
 localsourcemanager(self.config.get('local_path'), False, constants.EXTENSIONS).get_files()
 ```
 
-* this returns a list of gathered photos paths according to their extensions. ```False``` flag is to not check the location recursively
+* this returns a list of gathered photos paths according to their extensions. ```False``` flag is not to check the location recursively
 
 Flask [```send_file```](https://flask.palletsprojects.com/en/2.0.x/api/#flask.send_file) method that retuns file under URL needs to know the MIME type of the image, to get that we can use ePiframe dictionary in [constants file](https://github.com/MikeGawi/ePiframe/blob/master/misc/constants.py):
 ```
@@ -504,7 +504,7 @@ The results look like this:
 
 *Plugin will add the website to ePiframe WebUI to present the gathered photos (with use of API function stated above)*
 
-We have almost everything on place: photos synced to a local storage, generated photos thumbnails and API methods to simply display them. Now it's time to create a new ePiframe website that presents what we did by now. 
+We have almost everything in place: photos synced to a local storage, generated photos thumbnails and API methods to simply display them. Now it's time to create a new ePiframe website that presents what we did by now. 
 
 The sites are created with [Flask Blueprints](https://flask.palletsprojects.com/en/2.0.x/blueprints/) and it is possible to use ePiframe template with embedded jQuery and Bootstrap 5 that makes them very functional and beautiful. 
 
@@ -568,13 +568,13 @@ class show():
 * ```get_show_bp``` returns dynamically created website Blueprint with rendering method and URL binding
 * ```show_bp``` is a website Blueprint object that will be recognized for Flask under *show_bp* name, has templates and static folders configured to the ones we've created
 * ```@show_bp.route('/episync')``` is the route to our website (notice the Blueprint object name decorator at the beginning). ```http://<IP>/episync``` will be an URL for our website
-* ```@login_required``` decorator determines if website needs an user to be logged in to visit it. This decorator should be the last one just above the method name and can be removed so everyone can visit this site, even not authenticated users
+* ```@login_required``` decorator determines if website needs a user to be logged in to visit it. This decorator should be the last one just above the method name and can be removed so everyone can visit this site, even not authenticated users
 * ```def show()``` is a website rendering method that is executed when bounded address is visited. 
 * ```return render_template``` returns website template *show.html* that is in configured *templates* folder and passes values with names ```number```, ```width``` and ```height``` to the template. These names are arbitrary as are just the identifier inside the template
 * ```number=len(self.plugin.get_files())``` will be a number of synced files with use of our helping method from [Step 5: Extending API](#step-5-extending-api)
 * ```width=self.plugin.config.get('thumb_width')``` and ```height=self.plugin.config.get('thumb_height')``` will have plugin configuration passed values
 
-You probably wonder why this website is created in such tricky way, that's because we want to inject plugin class to use it inside the template and generating it inside a method that dynamically joins all elements is a good way to do that.
+You probably wonder why this website is created in such a tricky way, that's because we want to inject plugin class to use it inside the template and generating it inside a method that dynamically joins all elements is a good way to do that.
 
 To summarize what we did so far:
 * we've created a file structure to hold templates and Blueprint resources to generate a new webiste
@@ -583,7 +583,7 @@ To summarize what we did so far:
 
 The last step is to create the template itself. It needs some basic knowledge of Jinja, HTML, Javascript, Bootstrap 5 and jQuery but it's way more simple than it sounds. First, let's gather some elements that can help us.
 
-Our site name will be *ePisync show*. It should have the template of ePiframe to not stand out as we want it to be a part of ePiframe. It will show the synced photos thumbnails in a dynamic table that is responsive for the display that it works on and should be adapting to mobile view. Photo should be enlarged when clicked on.
+Our site name will be *ePisync show*. It should have the template of ePiframe not to stand out as we want it to be a part of ePiframe. It will show the synced photos thumbnails in a dynamic table that is responsive for the display that it works on and should be adapting to mobile view. Photo should be enlarged when clicked on.
 
 Let's check a ready template schema in Jinja for such site:
 ```
@@ -782,7 +782,7 @@ The configuration class and the configuration file will be rendered in ePiframe 
 ## Finishing touches
 
 As we've finished whole plugin implementation we should test it very deeply. During tests we should remember that:
-* ePiframe works well with high quality HDMI displays and with e-Paper displays with limitted color palette and size
+* ePiframe works well with high quality HDMI displays and with e-Paper displays with limited color palette and size
 * frame can be standing horizontally or vertically
 * ePiframe works usually on Raspberry Pi Zero which needs a well optimized code and resources-wise code
 * frame can be triggered from WebUI, Telegram Bot, CLI and ePiframe service
