@@ -1,4 +1,4 @@
-# ePiframe-plugin tutorial
+# ePiframe_plugin tutorial
 
 In this tutorial we will gather all steps needed to create a multi-functional ePiframe plugin. Some functions may seem unecessary or exaggerated but this is only done for tutorial purposes and to show how much one plugin can do.
 
