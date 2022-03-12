@@ -24,6 +24,7 @@
       * [Configuration file](#configuration-file)
    * [Testing](#testing)
    * [Plugin installation](#plugin-installation)
+      * [Plugins execution order](#plugins-execution-order)  
    * [Examples](#examples)
    * [License](#license)
    * [Tutorial](#tutorial)
@@ -751,6 +752,10 @@ But there are some basic steps typical for the ePiframe infrastructure that are 
 * Clone/download/extract the plugin to _<ePiframe_path>/plugins/<plugin_name_folder>_
 * Configure plugin with _<ePiframe_path>/plugins/<plugin_name_folder>.config.cfg_ file or in ePiframe WebUI under _Plugins/<plugin_name>_
 * Check configuration in WebUI or with ```./ePiframe.py --check-config``` command
+
+## Plugins execution order
+
+Some plugins, especially the ones that do visual changes to the photo, can overlap each other, e.g. a frame can be drawn on the information displayed on the photo. To avoid that it is possible to manually change the plugins execution order in the *plugins* folder *order.cfg* file, that will be populated after the first ePiframe run with new plugins. You can manually change the lines to adapt the order for the configuration or do that in *Plugins-Execution Order* menu in ePiframe WebUI.
 
 # License
 
