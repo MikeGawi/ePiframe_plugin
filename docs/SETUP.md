@@ -35,7 +35,7 @@
 Please follow these rules if you want to create your own plugin:
 * Include screenshot of visual changes made by the plugin (if any)
 * Add a short, one sentence, clear description what it does and put this data in the plugin class as well
-* Add what external API's/sites/modules/projects it uses and if they have limitations or price
+* Add what external APIs/sites/modules/projects it uses and if they have limitations or price
 * Include a detailed installation instruction, what needs to be installed and configured
 * Add plugin details in [this table](https://github.com/MikeGawi/ePiframe_plugin#plugins-list) and create a pull request
 
@@ -62,7 +62,7 @@ The scope starts in the root folder of ePiframe so if some module needs to be us
 
 Most of the basic ePiframe modules that can be useful for particular plugins methods are passed during the run but all needed ePiframe ingredients can be imported if needed.
 
-If exception occurs during the run of overridden method (that stops the next steps of the plugin) an exception should be raised to be catched by the main script to be properly reported in logs.
+If exception occurs during the run of overridden method (that stops the next steps of the plugin) an exception should be raised to be caught by the main script to be properly reported in logs.
 
 ## Files
 
@@ -76,52 +76,52 @@ If exception occurs during the run of overridden method (that stops the next ste
 	   └── _plugin.py
 ```
 
-*plugin_name* is the main directory of the plugin and it should be changed to the actual plugin name. Dot ('.') and dash ('-') characters are prohibited in the *plugin_name* due to Python module recognition!
+*plugin_name* is the main directory of the plugin, and it should be changed to the actual plugin name. Dot ('.') and dash ('-') characters are prohibited in the *plugin_name* due to Python module recognition!
 
-|File|Description|
-|----|-----------|
-|*_plugin.py*|main plugin module to work with| 
-|*config.cfg*|plugin configuration file| 
-|*config.default*|used to restore default configuration values|
+| File             | Description                                  |
+|------------------|----------------------------------------------|
+| *_plugin.py*     | main plugin module to work with              | 
+| *config.cfg*     | plugin configuration file                    | 
+| *config.default* | used to restore default configuration values |
 
 Initially *config.cfg* and *config.default* should be the same.
 
 ## Built-in objects
 
-|Object|Description|
-|------|-----------|
-|```self.config```|plugin configuration class| 
-|```constants.<variable name>```|[ePiframe global constants](https://github.com/MikeGawi/ePiframe/blob/master/misc/constants.py)|
-|```self.globalconfig```|global [ePiframe configuration](https://github.com/MikeGawi/ePiframe/blob/master/config.cfg)| 
-|```self.pidmgr```|[ePiframe pidmanager](https://github.com/MikeGawi/ePiframe/blob/master/modules/pidmanager.py) that holds and controls ePiframe PID|
-|```self.logging```|[ePiframe logger](https://github.com/MikeGawi/ePiframe/blob/master/misc/logs.py) that gathers runtime logs| 
+| Object                          | Description                                                                                                                        |
+|---------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| ```self.config```               | plugin configuration class                                                                                                         | 
+| ```Constants.<variable name>``` | [ePiframe global constants](https://github.com/MikeGawi/ePiframe/blob/master/misc/constants.py)                                    |
+| ```self.global_config```        | global [ePiframe configuration](https://github.com/MikeGawi/ePiframe/blob/master/config.cfg)                                       | 
+| ```self.pid_manager```          | [ePiframe pidmanager](https://github.com/MikeGawi/ePiframe/blob/master/modules/pidmanager.py) that holds and controls ePiframe PID |
+| ```self.logging```              | [ePiframe logger](https://github.com/MikeGawi/ePiframe/blob/master/misc/logs.py) that gathers runtime logs                         | 
 	
 Hints:
-* Use global constants with ```constants.<variable name>```
+* Use global constants with ```Constants.<variable name>```
 * Put something to logs with ```self.logging.log('<text>')```
-* Get global configuration value with ```self.globalconfig.get('<entry name>')```
+* Get global configuration value with ```self.global_config.get('<entry name>')```
 * Get the plugin local configuration value with ```self.config.get('<entry name>')```
 
 ## Methods
 
-```plugin``` class photos specific exposed methods to override:
+```Plugin``` class photos specific exposed methods to override:
 
-|Method|Description|
-|------|-----------|
-|```add_photo_source```|adding new photos source|
-|```add_photo_source_get_file```|retrieve the file (that has been picked up from the new source specified above)| 
-|```change_photos_list```|changing collected photos list| 
-|```preprocess_photo```|high quality source photo preprocessing before conversion for the display| 
-|```postprocess_photo```|converted photo postprocessing when photo is ready to be put on the display|
+| Method                          | Description                                                                     |
+|---------------------------------|---------------------------------------------------------------------------------|
+| ```add_photo_source```          | adding new photos source                                                        |
+| ```add_photo_source_get_file``` | retrieve the file (that has been picked up from the new source specified above) | 
+| ```change_photos_list```        | changing collected photos list                                                  | 
+| ```preprocess_photo```          | high quality source photo preprocessing before conversion for the display       | 
+| ```postprocess_photo```         | converted photo postprocessing when photo is ready to be put on the display     |
 
 Other ```plugin``` class exposed methods to override:
 
-|Method|Description|
-|------|-----------|
-|```extend_api```|extending API functions|
-|```add_website```|adding new websites to ePiframe WebUI| 
-|```add_action```|adding new action buttons to ePiframe Tools section in WebUI| 
-|```add_service_thread```|adding new thread to ePiframe service| 
+| Method                   | Description                                                  |
+|--------------------------|--------------------------------------------------------------|
+| ```extend_api```         | extending API functions                                      |
+| ```add_website```        | adding new websites to ePiframe WebUI                        | 
+| ```add_action```         | adding new action buttons to ePiframe Tools section in WebUI | 
+| ```add_service_thread``` | adding new thread to ePiframe service                        | 
 
 # Plugin methods
 
@@ -134,10 +134,10 @@ Other ```plugin``` class exposed methods to override:
 * **Passed variables:**
 	|Variable|Description|
 	|--------|-----------|
-	|```idlabel```|photo ID label name|
-	|```creationlabel```|photo creation time label name|
-	|```sourcelabel```|photo source label name|
-* **Returns:** _Pandas DataFrame_ of collected photos with columns _idlabel_, _creationlabel_, _sourcelabel_ (at least). Add more columns if needed
+	|```id_label```|photo ID label name|
+	|```creation_label```|photo creation time label name|
+	|```source_label```|photo source label name|
+* **Returns:** _Pandas DataFrame_ of collected photos with columns _id_label_, _creation_label_, _source_label_ (at least). Add more columns if needed
 * **Current functionality of ePiframe:** gathering photos from specific albums of Google Photos and/or local storage
 
 This method should collect the data of new photos and return Pandas DataFrame that will be processed (i.e. filtered, sorted, combined with other sources and used to pick up photo). The ID (unique and can be filename or some id from image hosting site), creation time and source columns are crucial - with them the sorting and filtering will work out of the box.
@@ -147,24 +147,36 @@ ePiframe works only on the list of photos information not on files as it would b
 Examples:
 
 ```
-def add_photo_source (self, idlabel, creationlabel, sourcelabel, photomgr):
-	#add files from local path
-	from modules.localsourcemanager import localsourcemanager
-	loc = localsourcemanager ('path_to_photos', False, constants.EXTENSIONS)
+def add_photo_source(
+		self,
+		id_label: str,
+		creation_label: str,
+		source_label: str,
+		photo_manager: PhotoManager,
+):
+	# add files from local path
+	from modules.localsourcemanager import LocalSourceManager
+	location = LocalSourceManager ('path_to_photos', False, Constants.EXTENSIONS)
 	self.SOURCE = "'{}' plugin source".format(self.name) #it is required to set the source name
-	return loc.get_local_photos(idlabel, creationlabel, sourcelabel, self.SOURCE)
+	return location.get_local_photos(id_label, creation_label, source_label, self.SOURCE)
 ```
 
 ```
-def add_photo_source (self, idlabel, creationlabel, sourcelabel, photomgr):
-	#add files with dates to DataFrame, set source and return:
+def add_photo_source(
+		self,
+		id_label: str,
+		creation_label: str,
+		source_label: str,
+		photo_manager: PhotoManager,
+):	
+	# add files with dates to DataFrame, set source and return:
 	import pandas as pd
 	photos = pd.DataFrame()
 	files = <get files...>
 	dates = <get files dates ...>
-	photos = pd.DataFrame(list(zip(files, dates)), columns=[idlabel, creationlabel])
+	photos = pd.DataFrame(list(zip(files, dates)), columns=[id_label, creation_label])
 	self.SOURCE = "'{}' plugin source".format(self.name) #it is required to set the source name
-	photos[sourcelabel] = self.SOURCE
+	photos[source_label] = self.SOURCE
 	return photos
 ```
 
@@ -184,12 +196,12 @@ __*NOTE:*__ Creation time must be in _YYYY-mm-ddTHH:MM:SSZ_, i.e. 2021-01-27T22:
 * **Passed variables:**
 	|Variable|Description|
 	|--------|-----------|
-	|```photo```|a Pandas element photo representation with all possible columns and ```idlabel``` as identifier|
+	|```photo```|a Pandas element photo representation with all possible columns and ```id_label``` as identifier|
 	|```path```|the target path of the photo|
 	|```filename```|photo target name (only), no extension|
-	|```idlabel```|photo ID label name|
-	|```creationlabel```|photo creation time label name|
-	|```sourcelabel```|photo source label name|
+	|```id_label```|photo ID label name|
+	|```creation_label```|photo creation time label name|
+	|```source_label```|photo source label name|
 * **Returns:** photo final path + filename, best if it contains an extension
 * **Current functionality of ePiframe:** downloading selected photo from Google Photos and/or copying from local storage
 
@@ -200,29 +212,47 @@ ePiframe works only on the list of photos information not on files as it would b
 Examples:
 
 ```
-def add_photo_source_get_file (self, photo, path, filename, idlabel, creationlabel, sourcelabel, photomgr):
+def add_photo_source_get_file(
+        self,
+        photo,
+        path: str,
+        filename: str,
+        id_label: str,
+        creation_label: str,
+        source_label: str,
+        photo_manager: PhotoManager,
+):
 	#add extension from MIME type and copy from source to target location with extension added:
 	import shutil
-	from modules.convertmanager import convertmanager
-	convertman = convertmanager()
-	filename_ret = ''		
-	err, imagetype = convertman.get_image_format(self.globalconfig.get('convert_bin_path'), photo[idlabel], constants.FIRST_FRAME_GIF) #if this is a GIF then just check the first frame
-	if not err and imagetype:
-		filename_ret = filename + "." + constants.TYPE_TO_EXTENSION[constants.MIME_START + imagetype.lower()]
-	filename_ret = os.path.join(path, filename_ret) 
-	shutil.copy(photo[idlabel], filename_ret)
-	return filename_ret
+	from modules.convertmanager import ConvertManager
+	convert_manager = ConvertManager()
+	returned_filename = ''		
+	error, image_type = convert_manager.get_image_format(self.global_config.get('convert_bin_path'), photo[id_label], constants.FIRST_FRAME_GIF) #if this is a GIF then just check the first frame
+	if not error and image_type:
+		returned_filename = filename + "." + Constants.TYPE_TO_EXTENSION[constants.MIME_START + image_type.lower()]
+	returned_filename = os.path.join(path, filename_ret) 
+	shutil.copy(photo[id_label], returned_filename)
+	return returned_filename
 ```
 
 ```
-def add_photo_source_get_file (self, photo, path, filename, idlabel, creationlabel, sourcelabel, photomgr):
-	#this source gets photo MIME type (can be converted to extension name with constants) and download URL so create a filename and download the file:
+def add_photo_source_get_file(
+        self,
+        photo,
+        path: str,
+        filename: str,
+        id_label: str,
+        creation_label: str,
+        source_label: str,
+        photo_manager: PhotoManager,
+):	
+	#this source gets photo MIME type (can be converted to extension name with Constants) and download URL so create a filename and download the file:
 	#The MIME type and URL column should be populated in the previous source collecting method !
-	filename_ret = filename + "." + constants.TYPE_TO_EXTENSION[photo['MIMETYPE_HEADER']]
-	downloadUrl = photo['URL']
-	connection.download_file(downloadUrl, path, filename_ret, constants.OK_STATUS_ERRORCODE, constants.CHECK_CONNECTION_TIMEOUT)
+	returned_filename = filename + "." + Constants.TYPE_TO_EXTENSION[photo['MIMETYPE_HEADER']]
+	download_url = photo['URL']
+	Connection.download_file(download_url, path, returned_filename, Constants.OK_STATUS_ERRORCODE, Constants.CHECK_CONNECTION_TIMEOUT)
 	#... timeout, connection error handling, etc.
-	return filename_ret
+	return returned_filename
 ```
 
 References: 
@@ -241,26 +271,34 @@ __*NOTE:*__ Creation time must be in _YYYY-mm-ddTHH:MM:SSZ_, i.e. 2021-01-27T22:
 * **Passed variables:**
 	|Variable|Description|
 	|--------|-----------|
-	|```photo_list```|a Pandas element photos list representation with all possible columns and idlabel as identifier|
-	|```idlabel```|photo ID label name|
-	|```creationlabel```|photo creation time label name|
-	|```sourcelabel```|photo source label name|
+	|```photo_list```|a Pandas element photos list representation with all possible columns and id_label as identifier|
+	|```id_label```|photo ID label name|
+	|```creation_label```|photo creation time label name|
+	|```source_label```|photo source label name|
 * **Returns:**  modified ```photo_list``` (Pandas DataFrame)
 * **Current functionality of ePiframe:** sorting (ascendingly, descendingly), filtering by creation date, by number of photos
 
 Example:
 
 ```
-def change_photos_list (self, idlabel, creationlabel, sourcelabel, photo_list, photomgr, indexmgr, filteringmgr):
-	#sort photo_list descendingly by creation time:
-	return photo_list.sort_values(by = creationlabel, ascending = False)
+def change_photos_list(
+        self,
+        id_label: str,
+        creation_label: str,
+        source_label: str,
+        photo_list,
+        photo_manager: PhotoManager,
+        index_manager: IndexManager,
+        filtering_manager: FilteringManager,
+):	#sort photo_list descendingly by creation time:
+	return photo_list.sort_values(by = creation_label, ascending = False)
 ```
 
 References: 
 * [ePiframe Filtering Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/filteringmanager.py)
 
 __*NOTE:*__ Creation time must be in _YYYY-mm-ddTHH:MM:SSZ_, i.e. 2021-01-27T22:59:37Z format!
-__*NOTE:*__ It's good to reset the records indexing after sorting with ```photomgr.reset_index(photo_list)```
+__*NOTE:*__ It's good to reset the records indexing after sorting with ```photo_manager.reset_index(photo_list)```
 	
 ## Photo preprocessing
 
@@ -271,34 +309,43 @@ __*NOTE:*__ It's good to reset the records indexing after sorting with ```photom
 * **Passed variables:**
 	|Variable|Description|
 	|--------|-----------|
-	|```orgphoto```|the source/target photo path with name and extension|
-	|```is_horizontal```|boolean, indicates wheter frame is in horizontal position|
-	|```photo```|a Pandas element photo representation with all possible columns and ```idlabel``` as identifier|
-	|```idlabel```|photo ID label name|
-	|```creationlabel```|photo creation time label name|
-	|```sourcelabel```|photo source label name|
+	|```original_photo```|the source/target photo path with name and extension|
+	|```is_horizontal```|boolean, indicates whether frame is in horizontal position|
+	|```photo```|a Pandas element photo representation with all possible columns and ```id_label``` as identifier|
+	|```id_label```|photo ID label name|
+	|```creation_label```|photo creation time label name|
+	|```source_label```|photo source label name|
 * **Returns:** photo final filename, best if it contains an extension
-* **Returns:**  _nothing_. This method should save modified photo as ```orgphoto``` name passed to it
+* **Returns:**  _nothing_. This method should save modified photo as ```original_photo``` name passed to it
 * **Current functionality of ePiframe:** there is no photo preprocessing
 
 Example:
 
 ```
-def preprocess_photo (self, orgphoto, is_horizontal, convertmgr, photo, idlabel, creationlabel, sourcelabel):
+def preprocess_photo(
+        self,
+        original_photo: str,
+        is_horizontal: bool,
+        convert_manager: ConvertManager,
+        photo,
+        id_label: str,
+        creation_label: str,
+        source_label: str,
+):
 	#add graphic element from file to the photo:
 	from PIL import Image
-	image = Image.open(orgphoto)
+	image = Image.open(original_photo)
 	width, height = image.size #get image size if needed
 	element = Image.open(element_path)
 	image.paste(element, (1, 100))
-	image.save(orgphoto)
+	image.save(original_photo)
 ```
 
 __*NOTE:*__ In case when this method is executed for command ```--test-convert``` ([ePiframe commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line)) ```photo``` can be an empty Pandas DataFrame as the image is taken from path not from the source. Always check if ```if not photo.empty ...```
 
-__*NOTE:*__ It is possible to process photo only from a specific source. In that case ```photo``` source label identified by ```sourcelabel``` should have specific value, i.e ```if photo and photo[sourcelabel] == source_name: <process>...```.
+__*NOTE:*__ It is possible to process photo only from a specific source. In that case ```photo``` source label identified by ```source_label``` should have specific value, i.e ```if photo and photo[source_label] == source_name: <process>...```.
 
-__*NOTE:*__ It is possible to get image size directly from file with ```err, width, height = convertmanager().get_image_size(self.globalconfig.get('convert_bin_path'), orgphoto, constants.FIRST_FRAME_GIF)```
+__*NOTE:*__ It is possible to get image size directly from file with ```error, width, height = ConvertManager().get_image_size(self.global_config.get('convert_bin_path'), original_photo, Constants.FIRST_FRAME_GIF)```
 
 **_❗ IMPORTANT ❗_** Image processing operations (especially processing of huge, high quality photos) are very resources consuming so keep in mind that ePiframe usually works on Raspberry Pi Zero.
 
@@ -314,34 +361,45 @@ References:
 * **Passed variables:**
 	|Variable|Description|
 	|--------|-----------|
-	|```finalphoto```|the source/target photo path with name and extension|
+	|```final_photo```|the source/target photo path with name and extension|
 	|```width```|photo width in pixels|
 	|```height```|photo height in pixels|
-	|```is_horizontal```|boolean, indicates wheter frame is in horizontal position|
-	|```photo```|a Pandas element photo representation with all possible columns and ```idlabel``` as identifier|
-	|```idlabel```|photo ID label name|
-	|```creationlabel```|photo creation time label name|
-	|```sourcelabel```|photo source label name|
-* **Returns:**  _nothing_. This method should save modified photo as ```finalphoto``` name passed to it
+	|```is_horizontal```|boolean, indicates whether frame is in horizontal position|
+	|```photo```|a Pandas element photo representation with all possible columns and ```id_label``` as identifier|
+	|```id_label```|photo ID label name|
+	|```creation_label```|photo creation time label name|
+	|```source_label```|photo source label name|
+* **Returns:**  _nothing_. This method should save modified photo as ```final_photo``` name passed to it
 * **Current functionality of ePiframe:** adding weather information
 
 Example:
 
 ```
-def postprocess_photo (self, finalphoto, width, height, is_horizontal, convertmgr, photo, idlabel, creationlabel, sourcelabel):
+def postprocess_photo(
+    self,
+    final_photo: str,
+    width: int,
+    height: int,
+    is_horizontal: bool,
+    convert_manager: ConvertManager,
+    photo,
+    id_label: str,
+    creation_label: str,
+    source_label: str,
+):
 	#add text to converted photo:
 	from PIL import Image, ImageDraw, ImageFont, ImageColor
-	image = Image.open(finalphoto)
+	image = Image.open(final_photo)
 	#rotating image if frame not in horizontal position
-	if not is_horizontal: image = image.transpose(Image.ROTATE_90 if self.globalconfig.getint('rotation') == 90 else Image.ROTATE_270)
+	if not is_horizontal: image = image.transpose(Image.ROTATE_90 if self.global_config.getint('rotation') == 90 else Image.ROTATE_270)
 	draw = ImageDraw.Draw(image)
 	font = ImageFont.truetype(os.path.join(self.path, 'static/fonts/NotoSans-SemiCondensed.ttf'), 20) #path holds the absolute path to the plugin folder
 	stroke = ImageColor.getcolor('Black', image.mode) #mind the color mode of the image
 	fill = ImageColor.getcolor('White', image.mode)
 	draw.text((1, 100), 'text', font = font, stroke_width = 2, stroke_fill = stroke, fill = fill)
 	#rotating back if in vertical position
-	if not is_horizontal: image = image.transpose(Image.ROTATE_270 if self.globalconfig.getint('rotation') == 90 else Image.ROTATE_90)
-	image.save(finalphoto)
+	if not is_horizontal: image = image.transpose(Image.ROTATE_270 if self.global_config.getint('rotation') == 90 else Image.ROTATE_90)
+	image.save(final_photo)
 ```
 
 References: 
@@ -349,7 +407,7 @@ References:
 
 __*NOTE:*__ In case when this method is executed for command ```--test-convert``` ([ePiframe commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line)) ```photo``` can be an empty Pandas DataFrame as the image is taken from path not from the source. Always check if ```if not photo.empty ...```
 
-__*NOTE:*__ It is possible to process photo only from a specific source. In that case ```photo``` source label identified by ```sourcelabel``` should have specific value, i.e ```if photo and photo[sourcelabel] == source_name: <process>...```.
+__*NOTE:*__ It is possible to process photo only from a specific source. In that case ```photo``` source label identified by ```source_label``` should have specific value, i.e ```if photo and photo[source_label] == source_name: <process>...```.
 
 __*NOTE:*__ Photo can be converted to some specific image mode at this point (e.g. black and white) and is in the size ready for the display (e.g. 800x480 pixels) so have that in mind during image manipulations.
 
@@ -362,7 +420,7 @@ __*NOTE:*__ Photo can be converted to some specific image mode at this point (e.
 	* [Users Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/usersmanager.py) - WebUI users handling, access to users database, etc.
 	* [Backend Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/backendmanager.py) - All WebUI/Telegram Bot backend functions, files handling, triggering functions, etc.
 * **Passed variables:** _none_
-* **Returns:** list of ```webmgr.site_bind``` objects (possible fields: ```url```, ```func```, ```methods = ['GET']```, ```defaults = None```) that have typical [Flask binding](https://flask.palletsprojects.com/en/2.0.x/quickstart/#url-building) syntax and point to a function to trigger
+* **Returns:** list of ```web_manager.site_bind``` objects (possible fields: ```url```, ```func```, ```methods = ['GET']```, ```defaults = None```) that have typical [Flask binding](https://flask.palletsprojects.com/en/2.0.x/quickstart/#url-building) syntax and point to a function to trigger
 * **Current functionality of ePiframe:** [ePiframe API](https://github.com/MikeGawi/ePiframe/blob/master/docs/API.md)
 
 Example:
@@ -382,16 +440,21 @@ from flask_login import login_required
 @login_required
 def get_data_func(self):
 	from flask import jsonify, request
-	data = dbconn.get_data_from_query(request.args.get('query')) #get data from database
+	data = db_connection.get_data_from_query(request.args.get('query')) #get data from database
 	return jsonify(data_label=data)
 
 #This is the plugin method that is fired:
-def extend_api (self, webmgr, usersmgr, backend):
-	newapis = [
-		webmgr.site_bind('/api/get_text/<text>', self.get_text_func),
-		webmgr.site_bind('/api/get_data', self.get_data_func)
+def extend_api(
+        self,
+        web_manager: WebUIManager,
+        users_manager: UsersManager,
+        backend: BackendManager,
+):	
+	new_apis = [
+		WebUIManager.SiteBind('/api/get_text/<text>', self.get_text_func),
+		WebUIManager.SiteBind('/api/get_data', self.get_data_func)
 	]		
-	return newapis
+	return new_apis
 ```
 
 __*NOTE:*__ For more complicated API features plugin ```add_website method``` below (with [Flask Blueprints](https://flask.palletsprojects.com/en/2.0.x/blueprints/)) can be used (without adding menu entry)
@@ -405,22 +468,27 @@ __*NOTE:*__ For more complicated API features plugin ```add_website method``` be
 	* [Users Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/usersmanager.py) - WebUI users handling, access to users database, etc.
 	* [Backend Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/backendmanager.py) - All WebUI/Telegram Bot backend functions, files handling, triggering functions, etc.
 * **Passed variables:** _none_
-* **Returns:** _optional_ - for new menu entries list of ```webmgr.menu_entry``` objects. Possible fields: ```name```, ```url```, ```id```, ```icon```
+* **Returns:** _optional_ - for new menu entries list of ```WebUIManager.MenuEntry``` objects. Possible fields: ```name```, ```url```, ```id```, ```icon```
 * **Current functionality of ePiframe:** serving Web User Interface to configure and control the frame
 
-The sites are created with [Flask Blueprints](https://flask.palletsprojects.com/en/2.0.x/blueprints/) and it is possible to use ePiframe template with embedded jQuery and Bootstrap 5 (check example). 
+The sites are created with [Flask Blueprints,](https://flask.palletsprojects.com/en/2.0.x/blueprints/) and it is possible to use ePiframe template with embedded jQuery and Bootstrap 5 (check example). 
 
-For new menu entries (optional) list of ```webmgr.menu_entry``` objects is used, possible fields: ```name```, ```url```, ```id```, ```icon```. ```name``` is the name of the menu entry to appear (e.g. "Show graph"), ```url``` is the link path e.g. "/test", ```id``` is the element ID to find it with javascript and for example change styling when active. ```icon``` should be taken from [Boostrap Icons](https://icons.getbootstrap.com/), e.g. "bi bi-alarm"
+For new menu entries (optional) list of ```WebUIManager.MenuEntry``` objects is used, possible fields: ```name```, ```url```, ```id```, ```icon```. ```name``` is the name of the menu entry to appear (e.g. "Show graph"), ```url``` is the link path e.g. "/test", ```id``` is the element ID to find it with javascript and for example change styling when active. ```icon``` should be taken from [Boostrap Icons](https://icons.getbootstrap.com/), e.g. "bi bi-alarm"
 
 Example:
 
 ```
 #add new website 'Test' with link to '<IP>/test'in WebUI menu:
 
-def add_website (self, webmgr, usersmgr, backend):
+def add_website(
+        self,
+        web_manager: WebUIManager,
+        users_manager: UsersManager,
+        backend: BackendManager,
+):
 	from plugins.<plugin_name>.<website_name> import <website_name>_bp
-	menus = [ webmgr.menu_entry ('Test', '/test', 'test-menu', 'bi bi-apple') ] #can be more than one
-	webmgr.add_menu_entries(menus) #optional
+	menus = [ WebUIManager.MenuEntry ('Test', '/test', 'test-menu', 'bi bi-apple') ] #can be more than one
+	web_manager.add_menu_entries(menus) #optional
 	websites = [ <website_name>_bp ] #can be more than one
 	return websites
 ```
@@ -483,7 +551,7 @@ from flask_login import login_required
 
 class <website_name>():
 	#constructor to pass plugin class
-	def __init__(self, plugin):
+	def __init__(self, plugin: PluginBase):
 		self.plugin = plugin
 
 	#returns generated blueprint website with injected plugin class
@@ -500,10 +568,15 @@ class <website_name>():
 __*NOTE:*__ It is possible to add just the menu entry (e.g. add a link on ePiframe for a server site) with:
 
 ```
-def add_website (self, webmgr, usersmgr, backend):
-	menus = [ webmgr.menu_entry ('Server', '<server_ip>', 'server-menu', 'bi bi-server') ] #can be more than one
-	webmgr.add_menu_entries(menus)
-	return []
+    def add_website(
+            self,
+            web_manager: WebUIManager,
+            users_manager: UsersManager,
+            backend: BackendManager,
+    ):	
+		menus = [ WebUIManager.MenuEntry ('Server', '<server_ip>', 'server-menu', 'bi bi-server') ] #can be more than one
+		web_manager.add_menu_entries(menus)
+		return []
 ```
 
 ## Adding new actions
@@ -515,30 +588,35 @@ def add_website (self, webmgr, usersmgr, backend):
 	* [Users Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/usersmanager.py) - WebUI users handling, access to users database, etc.
 	* [Backend Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/backendmanager.py) - All WebUI/Telegram Bot backend functions, files handling, triggering functions, etc.
 * **Passed variables:** _none_
-* **Returns:** dictionary of ```action``` key and ```webmgr.action_entry``` value objects with possible fields: ```name```, ```func```, ```icon```, ```action```
+* **Returns:** dictionary of ```action``` key and ```WebUIManager.ActionEntry``` value objects with possible fields: ```name```, ```function```, ```icon```, ```action```
 * **Current functionality of ePiframe:** reset service, reboot, power off, next photo actions
 
-Dictionary of ```action``` key and ```webmgr.action_entry``` value objects is used, possible fields: ```name```, ```func```, ```icon```. ```action``` is the name of the button to appear (e.g. "Ping machine"), ```action``` is the action name e.g. "send_ping", ```func``` is the function to trigger and ```icon``` should be taken from [Boostrap Icons](https://icons.getbootstrap.com/), e.g. "bi bi-alarm".
+Dictionary of ```action``` key and ```WebUIManager.ActionEntry``` value objects is used, possible fields: ```name```, ```function```, ```icon```. ```action``` is the name of the button to appear (e.g. "Ping machine"), ```action``` is the action name e.g. "send_ping", ```func``` is the function to trigger and ```icon``` should be taken from [Boostrap Icons](https://icons.getbootstrap.com/), e.g. "bi bi-alarm".
 
 Example:
 
 ```
 #add two new action buttons to turn light on/off with configured IP:
 	
-def lighton(self):
+def light_on(self):
 	import requests
 	requests.get(url = self.config(light_ip), params = 'ON')
 
-def lightoff(self):
+def light_off(self):
 	import requests
 	requests.get(url = self.config(light_ip), params = 'OFF')
 
-def add_action (self, webmgr, usersmgr, backend):
-	newactions = {
-		'lighton' : webmgr.action_entry('Turn Light On', self.lighton, 'bi bi-lightbulb-fill', 'lighton'),
-		'lightoff' : webmgr.action_entry('Turn Light Off', self.lightoff, 'bi bi-lightbulb', 'lightoff'),
+def add_action(
+        self,
+        web_manager: WebUIManager,
+        users_manager: UsersManager,
+        backend: BackendManager,
+):
+	new_actions = {
+		'lighton' : WebUIManager.ActionEntry`('Turn Light On', self.light_on, 'bi bi-lightbulb-fill', 'lighton'),
+		'lightoff' : WebUIManager.ActionEntry('Turn Light Off', self.light_off, 'bi bi-lightbulb', 'lightoff'),
 	}
-	return newactions
+	return new_actions
 ```
 
 __*NOTE:*__ The new actions buttons will appear in the Tools section of ePiframe WebUI.
@@ -557,18 +635,18 @@ __*NOTE:*__ The new actions buttons will appear in the Tools section of ePiframe
 Example:
 
 ```
-#def add_service_thread (self, service, backend):
+def add_service_thread(self, service: Service, backend: BackendManager):
 	#gather statistics every 60 seconds - persistent thread, enabled by configuration:
-	from modules.statsmanager import statsmanager
+	from modules.statsmanager import StatsManager
 	import time
-	statsman = statsmanager(backend)
+	stats_mananger = StatsManager(backend)
 	while True:
 		backend.refresh() #check if frame configuration changed and reload it
 		if backend.is_web_enabled() and backend.stats_enabled():
 			try:
-				statsman.feed_stats()
-			except Exception as e:
-				self.logging.log(e)
+				stats_mananger.feed_stats()
+			except Exception as exception:
+				self.logging.log(exception)
 				pass		
 		time.sleep(60) #sleep 60 seconds between feeds
 ```
@@ -593,70 +671,70 @@ __*NOTE:*__ Keep backward compatibility of the plugin configuration files, like 
 
 ## Configuration class
 
-Add configuration entries ```misc.configprop``` to ```configmgr``` class ```SETTINGS``` list inside ```_plugin.py``` file to allow validation, conversion, option dependencies, etc. for the configuration of the plugin. This structure will also help rendering settings entries in ePiframe WebUI.
+Add configuration entries ```misc.configproperty.ConfigProperty``` to ```PluginConfigManager``` class ```SETTINGS``` list inside ```_plugin.py``` file to allow validation, conversion, option dependencies, etc. for the configuration of the plugin. This structure will also help rendering settings entries in ePiframe WebUI.
 
 Check:
 * [ePiframe Config Manager](https://github.com/MikeGawi/ePiframe/blob/master/modules/configmanager.py)
-* [ePiframe Config Property](https://github.com/MikeGawi/ePiframe/blob/master/misc/configprop.py)
+* [ePiframe Config Property](https://github.com/MikeGawi/ePiframe/blob/master/misc/configproperty.py)
 
-Possible ```misc.configprop``` properties and methods passed in constructor:
+Possible ```misc.configproperty.ConfigProperty``` properties and methods passed in constructor:
 
-|Property|Default Value|Description|
-|--------|-------------|-----------|
-|```name```|_none_|Name of the configuration entry that is also in the _config.cfg_ file|
-|```configmanager```|_none_|Reference to the Configuration Manager object used to parse configuration. Usually ```self```|
-|```prop_type```|```STRING_TYPE```|Type of the configuration property (check types below), used to validation and rendering in the WebUI|
-|```notempty```|```True```|Flag to disallow empty values for the entry. ```True``` - value is needed, ```False``` - value can be empty|
-|```dependency```|```None```|Property dependency check. More on that below|
-|```minvalue```|```None```|Used to validate minimal value of numerical properties. Can be used without ```maxvalue```|
-|```maxvalue```|```None```|Used to validate maximum value of numerical properties. Can be used without ```minvalue```|
-|```checkfunction```|```None```|Functon used to validate value of the property. It should return ```True``` when property value is correct|
-|```special```|```None```|Structure to check more complicated property dependencies. More on that below|
-|```length```|```None```|Property length check, e.g. list should have this number of elements. Should be used together with ```delimiter```|
-|```delimiter```|```None```|Delimiter for list type properties, used to split values. Should be used together with ```length```|
-|```possible```|```None```|List of possible values that property should be in. This will also check values so ```checkfunction``` is not necesarry|
-|```resetneeded```|```None```|Flag to display "Reset needed after changing this property" alert in WebUI. Used to service related properties|
-|```convert```|```None```|Method to convert value property to another value. More on that below|
+| Property             | Default Value     | Description                                                                                                             |
+|----------------------|-------------------|-------------------------------------------------------------------------------------------------------------------------|
+| ```name```           | _none_            | Name of the configuration entry that is also in the _config.cfg_ file                                                   |
+| ```config_manager``` | _none_            | Reference to the Configuration Manager object used to parse configuration. Usually ```self```                           |
+| ```prop_type```      | ```STRING_TYPE``` | Type of the configuration property (check types below), used to validation and rendering in the WebUI                   |
+| ```notempty```       | ```True```        | Flag to disallow empty values for the entry. ```True``` - value is needed, ```False``` - value can be empty             |
+| ```dependency```     | ```None```        | Property dependency check. More on that below                                                                           |
+| ```minvalue```       | ```None```        | Used to validate minimal value of numerical properties. Can be used without ```maxvalue```                              |
+| ```maxvalue```       | ```None```        | Used to validate maximum value of numerical properties. Can be used without ```minvalue```                              |
+| ```checkfunction```  | ```None```        | Functon used to validate value of the property. It should return ```True``` when property value is correct              |
+| ```special```        | ```None```        | Structure to check more complicated property dependencies. More on that below                                           |
+| ```length```         | ```None```        | Property length check, e.g. list should have this number of elements. Should be used together with ```delimiter```      |
+| ```delimiter```      | ```None```        | Delimiter for list type properties, used to split values. Should be used together with ```length```                     |
+| ```possible```       | ```None```        | List of possible values that property should be in. This will also check values so ```checkfunction``` is not necessary |
+| ```resetneeded```    | ```None```        | Flag to display "Reset needed after changing this property" alert in WebUI. Used to service related properties          |
+| ```convert```        | ```None```        | Method to convert value property to another value. More on that below                                                   |
 
-```dependency``` is a structure that can be defined in two ways: by the name of the property that should enable child property (e.g. ```"dependency='is_function_enabled'"``` - that will check if boolean of ```is_function_enabled``` value is ```True``` and enable dependent property) or a name of the parent entry and the value for more complicated checks, e.g. ```dependency=['display_type', displaymanager.get_spi()]``` (or ```dependency=['size', 90]```), the value of property ```'display_type'``` will be compared to ```displaymanager.get_spi()``` method result and will return ```True``` if the value is right, only then the children entries will be enabled as well.
+```dependency``` is a structure that can be defined in two ways: by the name of the property that should enable child property (e.g. ```"dependency='is_function_enabled'"``` - that will check if boolean of ```is_function_enabled``` value is ```True``` and enable dependent property) or a name of the parent entry and the value for more complicated checks, e.g. ```dependency=['display_type', display_manager.get_spi()]``` (or ```dependency=['size', 90]```), the value of property ```'display_type'``` will be compared to ```display_manager.get_spi()``` method result and will return ```True``` if the value is right, only then the children entries will be enabled as well.
 
-```special``` is defined as a method that gets two variables: check function and the list of properties that are dependent with each other, e.g. ```special=configprop.special(filteringmanager.verify_times, ['photos_from', 'photos_to'])```. The check function gets the list of properties values and should return ```True``` if the dependencies are met, e.g. check the start time and end time, end time shouldn't be before start time, so check function checks both values for that.
+```special``` is defined as a method that gets two variables: check function and the list of properties that are dependent with each other, e.g. ```special=ConfigProperty.Special(filtering_manager.verify_times, ['photos_from', 'photos_to'])```. The check function gets the list of properties values and should return ```True``` if the dependencies are met, e.g. check the start time and end time, end time shouldn't be before start time, so check function checks both values for that.
 
 ```convert``` is used for backward compatibility. The new value will be saved in the configuration, for example the date format changed and the new version needs to convert old property to the new format.
 
 Possible property types:
 
-|Type|Description|
-|----|-----------|
-|```STRING_TYPE```|Default type, used to hold text values|
-|```FILE_TYPE```|File type, used to hold paths that will be checked if exists|
-|```INTEGER_TYPE```|Integer value type, used to hold numerical values, with range checking|
-|```FLOAT_TYPE```|Floating value type, used to hold real number values, with range checking, e.g. -0.5, 120.8, etc.|
-|```BOOLEAN_TYPE```|Boolean value type, used to hold true/false values|
-|```STRINGLIST_TYPE```|List of strings type, used to hold text lists, for option selection, combos, etc.|
-|```INTLIST_TYPE```|List of integers type, used to hold numbers lists, for option selection, combos, etc.|
-|```PASSWORD_TYPE```|Password type, used to hold passwords and will be masked in the WebUI|
+| Type                  | Description                                                                                       |
+|-----------------------|---------------------------------------------------------------------------------------------------|
+| ```STRING_TYPE```     | Default type, used to hold text values                                                            |
+| ```FILE_TYPE```       | File type, used to hold paths that will be checked if exists                                      |
+| ```INTEGER_TYPE```    | Integer value type, used to hold numerical values, with range checking                            |
+| ```FLOAT_TYPE```      | Floating value type, used to hold real number values, with range checking, e.g. -0.5, 120.8, etc. |
+| ```BOOLEAN_TYPE```    | Boolean value type, used to hold true/false values                                                |
+| ```STRINGLIST_TYPE``` | List of strings type, used to hold text lists, for option selection, combos, etc.                 |
+| ```INTLIST_TYPE```    | List of integers type, used to hold numbers lists, for option selection, combos, etc.             |
+| ```PASSWORD_TYPE```   | Password type, used to hold passwords and will be masked in the WebUI                             |
 
 Examples:
 
 ```
 ## Config manager class.
-	class configmgr (configbase):
+	class PluginConfigManager (ConfigBase):
 		def load_settings(self):
 			## List of settings, one-to-one accurate with config.cfg and default/config.default files.
 			## This structure allows validation, conversion, dependencies, value and type verification and more.
 			self.SETTINGS = [
 				## this setting is required! 			
-				configprop('is_enabled', self, prop_type=configprop.BOOLEAN_TYPE)
-				#configprop('some_integer_value', self, minvalue=1, maxvalue=1080, prop_type=configprop.INTEGER_TYPE),
-				#configprop('some_string_value_that_can_be_empty_with_bool_dependency', self, notempty=False, dependency='is_enabled'),
-				#configprop('verified_integer_type_with_possible_options', self, prop_type=configprop.INTEGER_TYPE, possible=get_positions() or [1, 2, 3, 4], checkfunction=verify_position),
-				#configprop('ip_with_check_and_bool_dependency', self, dependency='use_web', checkfunction=connection.is_ip),
-				#configprop('delimited_list_of_integers', self, delimiter=',', prop_type=configprop.INTLIST_TYPE),
-				#configprop('delimited_list_of_strings_with_mult_values_special_check_and_length', self, delimiter=',', prop_type=configprop.STRINGLIST_TYPE, length=7, special=check(verifyfunc, ['1st_entry', '2nd_entry'])),
-				#configprop('value_based_dependency', self, minvalue=0, prop_type=configprop.INTEGER_TYPE, dependency=['config_entry_value_to_check', value_or_function_that_returns_value]),			
-				#configprop('path', self, prop_type=configprop.FILE_TYPE),
-				#configprop('string_with_convert_function_good_for_converting_old_config_values_to_new_version', self, convert=convert_function),
+				ConfigProperty('is_enabled', self, prop_type=ConfigProperty.BOOLEAN_TYPE)
+				#ConfigProperty('some_integer_value', self, minvalue=1, maxvalue=1080, prop_type=ConfigProperty.INTEGER_TYPE),
+				#ConfigProperty('some_string_value_that_can_be_empty_with_bool_dependency', self, notempty=False, dependency='is_enabled'),
+				#ConfigProperty('verified_integer_type_with_possible_options', self, prop_type=ConfigProperty.INTEGER_TYPE, possible=get_positions() or [1, 2, 3, 4], checkfunction=verify_position),
+				#ConfigProperty('ip_with_check_and_bool_dependency', self, dependency='use_web', checkfunction=Connection.is_ip),
+				#ConfigProperty('delimited_list_of_integers', self, delimiter=',', prop_type=ConfigProperty.INTLIST_TYPE),
+				#ConfigProperty('delimited_list_of_strings_with_mult_values_special_check_and_length', self, delimiter=',', prop_type=ConfigProperty.STRINGLIST_TYPE, length=7, special=check(verifyfunc, ['1st_entry', '2nd_entry'])),
+				#ConfigProperty('value_based_dependency', self, minvalue=0, prop_type=ConfigProperty.INTEGER_TYPE, dependency=['config_entry_value_to_check', value_or_function_that_returns_value]),			
+				#ConfigProperty('path', self, prop_type=ConfigProperty.FILE_TYPE),
+				#ConfigProperty('string_with_convert_function_good_for_converting_old_config_values_to_new_version', self, convert=convert_function),
 				## ...
 			]
 			
@@ -664,17 +742,17 @@ Examples:
 		
 		#def legacy_convert(self):
 			## Legacy exceptional backward handling for converting one property to another property under different name
-			## and the ones that misc.configprop.convert could not handle.
+			## and the ones that misc.configproperty.ConfigProperty.convert could not handle.
 			## Get global configuration value here with self.get('<entry name>')
 			
-	## End of configmgr class.
+	## End of PluginConfigManager class.
 ```
 
-__*NOTE:*__ To access main plugin class inside ```configmgr``` body use ```self.main_class```
+__*NOTE:*__ To access main plugin class inside ```PluginConfigManager``` body use ```self.main_class```
 
-__*NOTE:*__ To get plugins config properties simply use ```self.config.get(NAME)``` for text properties and ```self.config.getint(NAME)``` for integer. Check [configbase class](https://github.com/MikeGawi/ePiframe/tree/master/modules/base/configbase.py) for more methods.
+__*NOTE:*__ To get plugins config properties simply use ```self.config.get(NAME)``` for text properties and ```self.config.getint(NAME)``` for integer. Check [ConfigBase class](https://github.com/MikeGawi/ePiframe/tree/master/modules/base/configbase.py) for more methods.
 
-__*NOTE:*__ To get global ePiframe config properties simply use ```self.globalconfig.get(NAME)``` for text properties and ```self.globalconfig.getint(NAME)``` for integer. Check [configbase class](https://github.com/MikeGawi/ePiframe/tree/master/modules/base/configbase.py) for more methods and [ePiframe config.cfg file](https://github.com/MikeGawi/ePiframe/blob/master/config.cfg) for more properties
+__*NOTE:*__ To get global ePiframe config properties simply use ```self.global_config.get(NAME)``` for text properties and ```self.global_config.getint(NAME)``` for integer. Check [ConfigBase class](https://github.com/MikeGawi/ePiframe/tree/master/modules/base/configbase.py) for more methods and [ePiframe config.cfg file](https://github.com/MikeGawi/ePiframe/blob/master/config.cfg) for more properties
 
 ## Configuration file
 
@@ -727,12 +805,12 @@ __*NOTE:*__ Script will handle moving entries from one section to another as ent
 
 The plugin should be deeply tested before release as it can harm a working ePiframe. 
 
-Plugin should be installed in <*ePiframe root path*>*/plugins/*<*plugin_name*> path and you can just put it there to make tests easier but remember to [stop the service](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#service-control) to not interfere working frame.
+Plugin should be installed in <*ePiframe root path*>*/plugins/*<*plugin_name*> path, and you can just put it there to make tests easier but remember to [stop the service](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#service-control) to not interfere working frame.
 
 ePiframe [can be installed](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#manual) also on non-Pi architectures and to avoid Pi system check just run ePiframe with ```--test``` flag from CLI, i.e. ```./ePiframe.py --test```. Running WebUI and other services is possible with [other commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line).
 
 Remember that:
-* ePiframe works well with high quality HDMI displays and with e-Paper displays with limitted color palette and size
+* ePiframe works well with high quality HDMI displays and with e-Paper displays with limited color palette and size
 * frame can be standing horizontally or vertically
 * ePiframe works usually on Raspberry Pi Zero which needs a well optimized code and resources-wise code
 * frame can be triggered from WebUI, Telegram Bot, CLI and ePiframe service
@@ -745,7 +823,7 @@ With these hints you can plan testing scenarios and make sure that plugin works 
 # Plugin installation
 
 According to the [contribution statements](#contribution), plugin should precisely describe:
->* What external API's/sites/modules/projects it uses and if they have limitations or price
+>* What external APIs/sites/modules/projects it uses and if they have limitations or price
 >* Include a detailed installation instruction, what needs to be installed and configured
 
 But there are some basic steps typical for the ePiframe infrastructure that are common for all plugins:
@@ -759,7 +837,7 @@ Some plugins, especially the ones that do visual changes to the photo, can overl
 
 # License
 
-The default license for ePiframe_plugin base code is [LGPL-2.1 License](https://github.com/MikeGawi/ePiframe_plugin/blob/master/LICENSE) but it's up to the plugin author what license should it have. The plugin should not violate any copyright rules of used components and the author should take care to respect them. Some parts of the plugin code may be a valuable intellectual property and the ePiframe will not claim any part of it and will not take responsibility for its functionality. Long story short: *plugin is yours, do what you want as long as you don't harm anyone, especially yourself*. 
+The default license for ePiframe_plugin base code is [LGPL-2.1 License,](https://github.com/MikeGawi/ePiframe_plugin/blob/master/LICENSE) but it's up to the plugin author what license should it have. The plugin should not violate any copyright rules of used components and the author should take care to respect them. Some parts of the plugin code may be a valuable intellectual property and the ePiframe will not claim any part of it and will not take responsibility for its functionality. Long story short: *plugin is yours, do what you want as long as you don't harm anyone, especially yourself*. 
 
 # Examples
 

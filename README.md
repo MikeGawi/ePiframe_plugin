@@ -6,10 +6,10 @@ Check [the list](#plugins-list) of available plugins!
 
 # What is it?
 
-The base plugin class exposes methods to add new functions to photo frame or even to the Raspberry Pi itself as ePiframe runs it's own auto recovering service, Flask based website with jQuery and Bootstrap 5 and can trigger system functions. The plugin provides basic frame helper modules, access to backend and customizable configuration class that has validation, conversion, dependencies, value/type verification and more.
+The base plugin class exposes methods to add new functions to photo frame or even to the Raspberry Pi itself as ePiframe runs its own auto recovering service, Flask based website with jQuery and Bootstrap 5 and can trigger system functions. The plugin provides basic frame helper modules, access to backend and customizable configuration class that has validation, conversion, dependencies, value/type verification and more.
 
 With these methods plugin can extend ALL ePiframe photo functions:
-* Adds new photos source and photos retriving methods, e.g. new image hosting site source, adding methods to sync with cloud, etc.
+* Adds new photos source and photos retrieving methods, e.g. new image hosting site source, adding methods to sync with cloud, etc.
 * Manipulates collected photos list before selecting the photo, e.g. sorting, filtering, turning upside-down, adding AI recognition etc.
 * Preprocesses a high quality photo before conversion for the display, e.g. oil paint effect, photo filters, frame, stamps, etc.
 * Postprocesses converted (for the display size and type) photo before sending to frame, e.g. add text, re-convert, etc.
@@ -29,15 +29,15 @@ Check the detailed [documentation](https://github.com/MikeGawi/ePiframe_plugin/b
 Please follow these rules if you want to create your own plugin:
 * Include screenshot of visual changes made by the plugin (if any)
 * Add a short, one sentence, clear description what it does and put this data in the plugin class as well
-* Add what external API's/sites/modules/projects it uses and if they have limitations or price
+* Add what external APIs/sites/modules/projects it uses and if they have limitations or price
 * Include a detailed installation instruction, what needs to be installed and configured
 * Add plugin details in the table below and create a pull request - it will appear on this site
 
 # Plugins list
 
-|Plugin name and URL|Author|Description|
-|-------------------|------|----------|
-|[cryptocurrency_ePiframe](https://github.com/MikeGawi/cryptocurrency_ePiframe)|[MikeGawi](https://github.com/MikeGawi)|Displays cryptocurrency price and percentage change on frame|
-|[cartoon_ePiframe](https://github.com/MikeGawi/cartoon_ePiframe)|[MikeGawi](https://github.com/MikeGawi)|Photo cartoon-like style preprocessing|
-|[decor_ePiframe](https://github.com/MikeGawi/decor_ePiframe)|[MikeGawi](https://github.com/MikeGawi)|Display decorative frames and quotes on frame|
+| Plugin name and URL                                                            | Author                                  | Description                                                  |
+|--------------------------------------------------------------------------------|-----------------------------------------|--------------------------------------------------------------|
+| [cryptocurrency_ePiframe](https://github.com/MikeGawi/cryptocurrency_ePiframe) | [MikeGawi](https://github.com/MikeGawi) | Displays cryptocurrency price and percentage change on frame |
+| [cartoon_ePiframe](https://github.com/MikeGawi/cartoon_ePiframe)               | [MikeGawi](https://github.com/MikeGawi) | Photo cartoon-like style preprocessing                       |
+| [decor_ePiframe](https://github.com/MikeGawi/decor_ePiframe)                   | [MikeGawi](https://github.com/MikeGawi) | Display decorative frames and quotes on frame                |
 ||||
