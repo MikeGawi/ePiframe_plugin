@@ -1,28 +1,34 @@
 # ePiframe_plugin
 
-This code is a template to create new plugins for [ePiframe](https://github.com/MikeGawi/ePiframe) photo frame.
+This code is a template to create new plugins for the [ePiframe](https://github.com/MikeGawi/ePiframe) photo frame.
 
 Check [the list](#plugins-list) of available plugins!
 
+**This version is for ePiframe 2.0 (Plugin API v2).** Plugins written for ePiframe 1.x need to be updated - see
+[Migrating a 1.x plugin](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#migrating-a-1x-plugin).
+
 # What is it?
 
-The base plugin class exposes methods to add new functions to photo frame or even to the Raspberry Pi itself as ePiframe runs its own auto recovering service, Flask based website with jQuery and Bootstrap 5 and can trigger system functions. The plugin provides basic frame helper modules, access to backend and customizable configuration class that has validation, conversion, dependencies, value/type verification and more.
+The plugin base class (part of ePiframe) exposes methods to add new functions to the photo frame, or even to the
+Raspberry Pi itself, as ePiframe runs its own auto recovering service and a Flask based website and can trigger
+system functions. A plugin gets typed access to ePiframe (configuration, logger, photo index entries, ImageMagick)
+and its own configuration with validation, conversion, dependencies, value/type checks and WebUI rendering.
 
-With these methods plugin can extend ALL ePiframe photo functions:
-* Adds new photos source and photos retrieving methods, e.g. new image hosting site source, adding methods to sync with cloud, etc.
-* Manipulates collected photos list before selecting the photo, e.g. sorting, filtering, turning upside-down, adding AI recognition etc.
-* Preprocesses a high quality photo before conversion for the display, e.g. oil paint effect, photo filters, frame, stamps, etc.
-* Postprocesses converted (for the display size and type) photo before sending to frame, e.g. add text, re-convert, etc.
+With these methods a plugin can extend ePiframe photo functions:
+* Adds new photo sources and photo retrieving methods, e.g. a new image hosting site, a folder synced from a cloud
+* Preprocesses the high quality photo before the conversion for the display, e.g. oil paint effect, photo filters
+* Postprocesses the converted (to the display size and colors) photo before it is shown, e.g. text, frames, stamps
 
-But also methods to extend not strictly photo related functions:
-* Extends API functions, e.g. adding REST API, returns data by query/website such as getting hardware statistics, exposes API for smart home server, etc.
-* Adds WebUI new website, e.g. adds a server controlling site, with optional link in the WebUI menu and ePiframe templating.
-* Adds new action buttons in WebUI Tools section of ePiframe, e.g. controls device, triggers system action, controls smart devices, etc.
-* Adds new thread to ePiframe service, e.g. frequently gathering data, scheduled triggers, etc.
+But also not strictly photo related functions (these methods will be redesigned with the new WebUI of ePiframe 2.0):
+* Extends API functions, e.g. a REST API returning hardware statistics, an API for a smart home server
+* Adds new WebUI pages, e.g. a server control page, with an optional link in the WebUI menu and ePiframe styling
+* Adds new action buttons in the WebUI Tools section, e.g. controlling devices, triggering system actions
+* Adds new threads to the ePiframe service, e.g. frequently gathering data, scheduled triggers
 
 # How to start?
 
-Check the detailed [documentation](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md) with examples and [tutorial](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/TUTORIAL.md) and have fun!
+Check the detailed [documentation](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md) with
+examples and the [tutorial](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/TUTORIAL.md) and have fun!
 
 # Contribution
 
