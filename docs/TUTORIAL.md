@@ -502,9 +502,6 @@ too hardware demanding, or at least optimized for a Raspberry Pi.
 
 ### Step 5: Extending API
 
-**_🚧 Being redesigned 🚧_** The WebUI and API methods of plugins will change together with the new WebUI of
-ePiframe 2.0. Until then they keep their ePiframe 1.x form - the code below works with ePiframe 2.0 today.
-
 *The plugin extends the ePiframe API with a method returning a thumbnail or the original photo*
 
 ePiframe has a built-in [API](https://github.com/MikeGawi/ePiframe/blob/master/docs/API.md) performing simple
@@ -513,78 +510,123 @@ logs, get the current photo, etc. Plugins can add new actions like a REST API, h
 smart home server, etc.
 
 The ePiframe WebUI and API are based on Flask: we write a method doing an action or returning something and bind it
-to a URL.
+to a URL under `/api/`. The method is declared with ePiframe's `@api` decorator, which:
+* lets only logged-in users (or requests with a user's API key) call it,
+* reads the URL parameters into a [dataclass](https://docs.python.org/3/library/dataclasses.html) and answers a
+  wrong value with HTTP status 400 and `{"error": "<message>"}` - the method gets ready, typed values,
+* answers a returned dataclass as JSON and an `ApiError` raised by the method as `{"error": ...}`,
+* describes the method in ePiframe's [OpenAPI](https://spec.openapis.org/oas/v3.1.0) document
+  (`/api/openapi.json`) - no documentation to write by hand.
 
-The method to override is `extend_api`; it returns a list of `WebUIManager.SiteBind(url, function)` objects (a
-typical [Flask binding](https://flask.palletsprojects.com/en/stable/quickstart/#url-building)).
+The method to override is `extend_api`; it gets the frame (`epiframe.service.frame.Frame`) and returns a list of
+`Route(url, method)` objects (a typical
+[Flask binding](https://flask.palletsprojects.com/en/stable/quickstart/#url-building)). Routes outside `/api/` and
+methods without `@api` are skipped (with an error in the log).
 
 Example:
 ```python
-from flask import jsonify
+from dataclasses import dataclass
+
+from epiframe.service.frame import Frame
+from epiframe.web.api import api
+from epiframe.web.extensions import Route
+
+
+@dataclass(frozen=True)
+class TextPath:
+    text: str
+
+
+@dataclass(frozen=True)
+class Text:
+    text_label: str
 
 
 # called with /api/get_text/<text>
-def get_text_func(self, text: str = ""):
-    return jsonify(text_label=text)
+@api("Echo", path=TextPath, response=Text)
+def get_text(self, path: TextPath) -> Text:
+    return Text(path.text)
 
-def extend_api(self, web_manager: WebUIManager, users: object, backend: object):
-    return [WebUIManager.SiteBind("/api/get_text/<text>", self.get_text_func)]
+def extend_api(self, frame: Frame) -> list[Route]:
+    return [Route("/api/get_text/<text>", self.get_text)]
 ```
 
-* `get_text_func` gets `text` from the `<IP>/api/get_text/<text>` URL and returns it as JSON
-* `extend_api` binds the URL to `get_text_func`
+* `get_text` gets `text` from the `<IP>/api/get_text/<text>` URL (`path=`) and returns it as JSON:
+  `{"text_label": "..."}` (`response=`)
+* `extend_api` binds the URL to `get_text`
+* the parameters of the URL query (`?a=1&b=x`) are declared the same way with `query=`, a posted form (with files)
+  with `form=`; field types: `str`, `int`, `float`, `bool`, enums, `list[...]` (comma separated), `X | None`
+* a method returning something else than JSON (a file, a text) declares its type with `media_type=`, e.g.
+  `media_type="image/*"`
 
-More methods can be added, `extend_api` just returns a list of them.
+More methods can be added, `extend_api` just returns a list of them. The Flask name of the method (e.g. for
+`url_for` in a page template) is its name, so it must not be one ePiframe already uses (like `get_image`).
 
 Back to our plugin: *the API method returns a thumbnail or the original photo*, which the website (step 6) uses to
 show the synced photos.
 
-The photo index is chosen with a request argument: Flask gives the URL arguments in `request.args`, so
-`http://<IP>/api/get_sync_image?file=1&thumb` has `file=1` and the `thumb` flag. The list of synced files comes from
+The photo index and the thumbnail flag are URL query parameters: `http://<IP>/api/get_sync_image?file=1&thumb` has
+`file=1` and the `thumb` flag (a flag may be empty, `1`/`true` or `0`/`false`). The list of synced files comes from
 `synced_photos()` of [step 1](#step-1-photo-collection). Flask's
 [`send_file`](https://flask.palletsprojects.com/en/stable/api/#flask.send_file) returns a file and needs its MIME
 type - ePiframe's `EXTENSION_TO_TYPE` maps the extension to it.
 
 The code:
 ```python
-from flask import Response, request, send_file
-from flask_login import login_required
+import dataclasses
+from http import HTTPStatus
+
+from flask import Response, send_file
 
 from epiframe.core.media_types import EXTENSION_TO_TYPE
-from modules.webuimanager import WebUIManager
+from epiframe.service.frame import Frame
+from epiframe.web.api import ApiError, api, doc
+from epiframe.web.extensions import Route
+
+
+@dataclasses.dataclass(frozen=True)
+class SyncImageQuery:
+    """The parameters of /api/get_sync_image (Step 5)."""
+
+    file: int = dataclasses.field(default=0, metadata=doc("Index of the synced photo"))
+    thumb: bool = dataclasses.field(default=False, metadata=doc("Its thumbnail"))
 
 
 def synced_files(self) -> list[str]:
     return [photo.id for photo in self.synced_photos()]
 
-@login_required  # only logged-in users (or with the API key)
-def get_sync_image(self) -> Response | str:
+@api(
+    "Synced photo",
+    description="A photo synced by ePiSync or its thumbnail.",
+    query=SyncImageQuery,
+    media_type="image/*",
+    errors=(HTTPStatus.NOT_FOUND,),
+)
+def get_sync_image(self, query: SyncImageQuery) -> Response:
     # /api/get_sync_image?file=<index>[&thumb]
     files = self.synced_files()
-    argument = request.args.get("file", "0")
-    index = int(argument) if argument.isdigit() else 0
-    if index >= len(files):
-        return "No Photo!"
-    path = Path(files[index])
-    if "thumb" in request.args:
-        path = self.thumbnail(files[index])
+    if not 0 <= query.file < len(files):
+        raise ApiError("No photo!", HTTPStatus.NOT_FOUND)
+    name = files[query.file]
+    path = self.thumbnail(name) if query.thumb else Path(name)
     if not path.exists():
-        return "No Photo!"
+        raise ApiError("No photo!", HTTPStatus.NOT_FOUND)
     extension = path.suffix.lstrip(".").lower()
-    return send_file(path, mimetype=EXTENSION_TO_TYPE[extension])
+    return send_file(path.absolute(), mimetype=EXTENSION_TO_TYPE.get(extension))
 
-def extend_api(
-    self, web_manager: WebUIManager, users: object, backend: object
-) -> list[WebUIManager.SiteBind]:
-    return [WebUIManager.SiteBind("/api/get_sync_image", self.get_sync_image)]
+def extend_api(self, frame: Frame) -> list[Route]:
+    return [Route("/api/get_sync_image", self.get_sync_image)]
 ```
 
+* `SyncImageQuery` declares the parameters: `file` (0 when missing) and `thumb` (false when missing); `doc(...)`
+  describes them in the OpenAPI document
 * `synced_files` is a helper returning the synced photo paths
-* `@login_required` makes the method available only to logged-in users (or requests with a user's API key) -
-  without it anyone could call it
-* `get_sync_image` reads the photo index from `file` (0 when missing or not a number) and, with the `thumb` flag,
-  returns the thumbnail from [step 3](#step-3-thumbnails)
-* a wrong index or a missing file returns a text instead of a photo
+* `@api` makes the method available only to logged-in users (or requests with a user's API key) and gives it the
+  parsed `query`; `errors=` lists the error statuses for the documentation
+* `get_sync_image` returns the photo of the index or, with the `thumb` flag, its thumbnail from
+  [step 3](#step-3-thumbnails)
+* a wrong index or a missing file returns HTTP status 404 with `{"error": "No photo!"}`, a `file` that isn't a
+  number status 400 with `{"error": "Wrong file 'x', expected int"}`
 
 The results look like this:
 <div align="center">
@@ -599,7 +641,7 @@ The results look like this:
 
 |<img src ="https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/assets/apierror.png" width="400"/>|
 |:--:|
-|*API error for retrieving the photo index out of files list range*|
+|*API error for retrieving the photo index out of files list range (ePiframe 1.x screenshot: 2.0 answers `{"error": "No photo!"}` with HTTP status 404)*|
 </div>
 
 ### Step 6: Adding website
@@ -616,7 +658,7 @@ The pages are [Flask Blueprints](https://flask.palletsprojects.com/en/stable/blu
 page template with jQuery and Bootstrap 5, which makes them functional and good looking.
 
 The method to override is `add_website`; it returns a list of blueprints. Menu entries (optional) are added with
-`web_manager.add_menu_entries([WebUIManager.MenuEntry(name, url, id, icon)])`: `name` is the menu text (e.g. "Show
+`web_manager.add_menu_entries([MenuEntry(name, url, id, icon)])` (`epiframe.web.extensions.MenuEntry`): `name` is the menu text (e.g. "Show
 graph"), `url` the link path (e.g. "/test"), `id` the element id (to find it with JavaScript and e.g. highlight it
 when active) and `icon` a [Bootstrap Icons](https://icons.getbootstrap.com/) class, e.g. "bi bi-alarm".
 
@@ -636,13 +678,17 @@ In the plugin folder let's create the *templates* folder (page templates) and *s
 
 The plugin method is simple:
 ```python
+from epiframe.web.app import WebUI
+from epiframe.web.extensions import MenuEntry
+
+
 def add_website(
-    self, web_manager: WebUIManager, users: object, backend: object
+    self, web_manager: WebUI, users: object, backend: object
 ) -> list[object]:
     from plugins.ePiSync_code_tutorial.show import Show
 
     web_manager.add_menu_entries(
-        [WebUIManager.MenuEntry("ePiSync", "/episync", "episync-menu", "bi bi-image")]
+        [MenuEntry("ePiSync", "/episync", "episync-menu", "bi bi-image")]
     )
     return [Show(self).get_show_bp()]
 ```

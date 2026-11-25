@@ -8,10 +8,10 @@ https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/TUTORIAL.md
 import dataclasses
 import shutil
 import subprocess
+from http import HTTPStatus
 from pathlib import Path
 
-from flask import Response, request, send_file
-from flask_login import login_required
+from flask import Response, send_file
 from PIL import Image
 
 from epiframe.config.property import ConfigProperty, PropertyType
@@ -21,13 +21,24 @@ from epiframe.photos.model import Photo
 from epiframe.plugins.base import PhotoFile
 from epiframe.plugins.base import Plugin as PluginBase
 from epiframe.processing.imagemagick import ImageMagick, ImageMagickError
+from epiframe.service.frame import Frame
 from epiframe.sources.local import LocalSource, create_directory
-from modules.webuimanager import WebUIManager
+from epiframe.web.api import ApiError, api, doc
+from epiframe.web.app import WebUI
+from epiframe.web.extensions import MenuEntry, Route
 
 THUMBS_DIR = "thumbs"  # inside local_path
 THUMB_PREFIX = "thumb_"
 WATERMARK = "static/images/watermark.png"  # inside the plugin folder
 MARGIN = 10
+
+
+@dataclasses.dataclass(frozen=True)
+class SyncImageQuery:
+    """The parameters of /api/get_sync_image (Step 5)."""
+
+    file: int = dataclasses.field(default=0, metadata=doc("Index of the synced photo"))
+    thumb: bool = dataclasses.field(default=False, metadata=doc("Its thumbnail"))
 
 
 class Plugin(PluginBase):
@@ -178,40 +189,41 @@ class Plugin(PluginBase):
             Image.Transpose.ROTATE_90 if turn_left else Image.Transpose.ROTATE_270
         )
 
-    # ---------------------------------------- Step 5: API (1.x hook form)
+    # --------------------------------------------------------- Step 5: API
 
     def synced_files(self) -> list[str]:
         return [photo.id for photo in self.synced_photos()]
 
-    @login_required  # only logged-in users (or with the API key)
-    def get_sync_image(self) -> Response | str:
+    @api(
+        "Synced photo",
+        description="A photo synced by ePiSync or its thumbnail.",
+        query=SyncImageQuery,
+        media_type="image/*",
+        errors=(HTTPStatus.NOT_FOUND,),
+    )
+    def get_sync_image(self, query: SyncImageQuery) -> Response:
         # /api/get_sync_image?file=<index>[&thumb]
         files = self.synced_files()
-        argument = request.args.get("file", "0")
-        index = int(argument) if argument.isdigit() else 0
-        if index >= len(files):
-            return "No Photo!"
-        path = Path(files[index])
-        if "thumb" in request.args:
-            path = self.thumbnail(files[index])
+        if not 0 <= query.file < len(files):
+            raise ApiError("No photo!", HTTPStatus.NOT_FOUND)
+        name = files[query.file]
+        path = self.thumbnail(name) if query.thumb else Path(name)
         if not path.exists():
-            return "No Photo!"
+            raise ApiError("No photo!", HTTPStatus.NOT_FOUND)
         extension = path.suffix.lstrip(".").lower()
-        return send_file(path, mimetype=EXTENSION_TO_TYPE[extension])
+        return send_file(path.absolute(), mimetype=EXTENSION_TO_TYPE.get(extension))
 
-    def extend_api(
-        self, web_manager: WebUIManager, users: object, backend: object
-    ) -> list[WebUIManager.SiteBind]:
-        return [WebUIManager.SiteBind("/api/get_sync_image", self.get_sync_image)]
+    def extend_api(self, frame: Frame) -> list[Route]:
+        return [Route("/api/get_sync_image", self.get_sync_image)]
 
     # ------------------------------------- Step 6: website (1.x hook form)
 
     def add_website(
-        self, web_manager: WebUIManager, users: object, backend: object
+        self, web_manager: WebUI, users: object, backend: object
     ) -> list[object]:
         from plugins.ePiSync_code_tutorial.show import Show
 
         web_manager.add_menu_entries(
-            [WebUIManager.MenuEntry("ePiSync", "/episync", "episync-menu", "bi bi-image")]
+            [MenuEntry("ePiSync", "/episync", "episync-menu", "bi bi-image")]
         )
         return [Show(self).get_show_bp()]

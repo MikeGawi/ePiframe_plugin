@@ -156,7 +156,7 @@ Photo methods:
 | `preprocess_photo`  | editing the original photo before it is converted for the display       |
 | `postprocess_photo` | editing the converted photo just before it is shown                     |
 
-WebUI, API and service methods (`extend_api`, `add_website`, `add_action`, `add_service_thread`) are described in
+WebUI, API and service methods (`extend_api`, `add_action`, `add_website`, `add_service_thread`) are described in
 [WebUI, API and service methods](#webui-api-and-service-methods).
 
 The 1.x method `change_photos_list` doesn't exist anymore: ePiframe 2.0 doesn't load the whole photo list (a
@@ -345,18 +345,36 @@ References:
 
 ## WebUI, API and service methods
 
-**_🚧 Being redesigned 🚧_** These methods will change together with the new WebUI, API and service of ePiframe 2.0.
-Until then they keep their ePiframe 1.x form and work as before:
+| Method                                           | Returns                                                                     |
+|--------------------------------------------------|-----------------------------------------------------------------------------|
+| `extend_api(self, frame)`                        | a list of `Route(url, method)` - new REST API endpoints under `/api/`       |
+| `add_action(self, frame)`                        | a list of `Action(id, label, function, icon)` - WebUI Tools buttons, also run with `/api/action=<id>` |
+| `add_website(self, web_manager, users, backend)` | a list of Flask blueprints - new WebUI pages (menu entries with `web_manager.add_menu_entries([MenuEntry(name, url, id, icon)])`) |
+| `add_service_thread(self, service, backend)`     | nothing - the method runs as a thread of the ePiframe service               |
 
-| Method                                                       | Returns                                                             |
-|--------------------------------------------------------------|---------------------------------------------------------------------|
-| `extend_api(self, web_manager, users, backend)`              | a list of `WebUIManager.SiteBind(url, function)` - new API endpoints |
-| `add_website(self, web_manager, users, backend)`             | a list of Flask blueprints - new WebUI pages (menu entries with `web_manager.add_menu_entries([WebUIManager.MenuEntry(name, url, id, icon)])`) |
-| `add_action(self, web_manager, users, backend)`              | a dict of `WebUIManager.ActionEntry(name, function, icon, action)` - WebUI Tools buttons |
-| `add_service_thread(self, service, backend)`                 | nothing - the method runs as a thread of the ePiframe service       |
+`frame` is the frame (`epiframe.service.frame.Frame`: configuration, photo files, `next_photo()`, `reboot()`…).
+`Route`, `Action` and `MenuEntry` come from `epiframe.web.extensions`.
 
-`users` is ePiframe's users store (`epiframe.users.store.Users`). The [tutorial](TUTORIAL.md) (steps 5 and 6) shows
-an API endpoint and a WebUI page that work with ePiframe 2.0 today.
+API methods are declared with the `@api` decorator of `epiframe.web.api`: it requires the login (or a user's API
+key), reads the parameters into dataclasses (wrong values are answered with HTTP status 400 and
+`{"error": "<message>"}`), answers returned dataclasses as JSON and adds the method to ePiframe's OpenAPI document
+(`/api/openapi.json`). Routes outside `/api/` or without `@api` are skipped. See
+[tutorial step 5](TUTORIAL.md#step-5-extending-api).
+
+A tool button:
+```python
+from epiframe.service.frame import Frame
+from epiframe.web.extensions import Action
+
+
+def add_action(self, frame: Frame) -> list[Action]:
+    return [Action("lightoff", "Turn Light Off", self.light_off, "bi bi-lightbulb")]
+```
+
+**_🚧 Being redesigned 🚧_** `add_website` and `add_service_thread` will change together with the new WebUI and
+service of ePiframe 2.0. Until then they keep their ePiframe 1.x form (`web_manager` is ePiframe's
+`epiframe.web.app.WebUI`, `users` its users store, `backend` the frame). The [tutorial](TUTORIAL.md) (step 6) shows a
+WebUI page that works with ePiframe 2.0 today.
 
 # Creating configuration
 

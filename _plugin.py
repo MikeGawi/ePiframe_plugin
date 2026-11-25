@@ -115,7 +115,25 @@ class Plugin(PluginBase):
     #     ImageDraw.Draw(image).text((10, 10), "Hello!", fill=0)
     #     image.save(photo.path)
 
-    # ---------------------------------------------- WebUI, API, service threads
-    # extend_api, add_website, add_action and add_service_thread still have their
-    # ePiframe 1.x form (see the 1.x documentation) and will be redesigned
-    # together with the new WebUI and service of ePiframe 2.0.
+    # ------------------------------------------------------------- WebUI, API
+    # (imports: from epiframe.web.api import api, from epiframe.web.extensions
+    # import Action, Route, from dataclasses import dataclass)
+
+    # @api("Hello", response=Hello)  # Hello: a dataclass, answered as JSON
+    # def hello(self) -> Hello:
+    #     # login, parameters (query=, path=, form=) and the OpenAPI document
+    #     # come from @api; see docs/TUTORIAL.md step 5
+    #     return Hello(f"Hello from {self.name}!")
+
+    # def extend_api(self, frame) -> list[Route]:
+    #     # new REST API endpoints, only under /api/
+    #     return [Route("/api/hello", self.hello)]
+
+    # def add_action(self, frame) -> list[Action]:
+    #     # WebUI Tools buttons, also run with /api/action=<id>
+    #     return [Action("hello", "Say Hello", self.say_hello, "bi bi-chat")]
+
+    # ---------------------------------------------- WebUI pages, service threads
+    # add_website and add_service_thread still have their ePiframe 1.x form (see
+    # docs/SETUP.md) and will be redesigned together with the new WebUI and
+    # service of ePiframe 2.0.
