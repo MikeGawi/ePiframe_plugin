@@ -133,7 +133,14 @@ class Plugin(PluginBase):
     #     # WebUI Tools buttons, also run with /api/action=<id>
     #     return [Action("hello", "Say Hello", self.say_hello, "bi bi-chat")]
 
-    # ---------------------------------------------- WebUI pages, service threads
-    # add_website and add_service_thread still have their ePiframe 1.x form (see
-    # docs/SETUP.md) and will be redesigned together with the new WebUI and
-    # service of ePiframe 2.0.
+    # ----------------------------------------------------------- service thread
+
+    # def service_thread(self, frame, stop) -> None:
+    #     # runs once in the background of the ePiframe service; return when the
+    #     # service stops (stop is a threading.Event), e.g. check every minute:
+    #     while not stop.wait(60):
+    #         self.logger.info(f"Next photo {frame.next_update_text()}")
+
+    # ---------------------------------------------------------------- WebUI pages
+    # add_website still has its ePiframe 1.x form (see docs/SETUP.md) and will be
+    # redesigned together with the new WebUI of ePiframe 2.0.

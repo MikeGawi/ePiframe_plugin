@@ -156,7 +156,7 @@ Photo methods:
 | `preprocess_photo`  | editing the original photo before it is converted for the display       |
 | `postprocess_photo` | editing the converted photo just before it is shown                     |
 
-WebUI, API and service methods (`extend_api`, `add_action`, `add_website`, `add_service_thread`) are described in
+WebUI, API and service methods (`extend_api`, `add_action`, `add_website`, `service_thread`) are described in
 [WebUI, API and service methods](#webui-api-and-service-methods).
 
 The 1.x method `change_photos_list` doesn't exist anymore: ePiframe 2.0 doesn't load the whole photo list (a
@@ -350,7 +350,7 @@ References:
 | `extend_api(self, frame)`                        | a list of `Route(url, method)` - new REST API endpoints under `/api/`       |
 | `add_action(self, frame)`                        | a list of `Action(id, label, function, icon)` - WebUI Tools buttons, also run with `/api/action=<id>` |
 | `add_website(self, web_manager, users, backend)` | a list of Flask blueprints - new WebUI pages (menu entries with `web_manager.add_menu_entries([MenuEntry(name, url, id, icon)])`) |
-| `add_service_thread(self, service, backend)`     | nothing - the method runs as a thread of the ePiframe service               |
+| `service_thread(self, frame, stop)`              | nothing - the method runs once as a thread of the ePiframe service          |
 
 `frame` is the frame (`epiframe.service.frame.Frame`: configuration, photo files, `next_photo()`, `reboot()`…).
 `Route`, `Action` and `MenuEntry` come from `epiframe.web.extensions`.
@@ -371,9 +371,23 @@ def add_action(self, frame: Frame) -> list[Action]:
     return [Action("lightoff", "Turn Light Off", self.light_off, "bi bi-lightbulb")]
 ```
 
-**_🚧 Being redesigned 🚧_** `add_website` and `add_service_thread` will change together with the new WebUI and
-service of ePiframe 2.0. Until then they keep their ePiframe 1.x form (`web_manager` is ePiframe's
-`epiframe.web.app.WebUI`, `users` its users store, `backend` the frame). The [tutorial](TUTORIAL.md) (step 6) shows a
+A service thread runs once, in the background of the ePiframe service, from its start until it stops. `stop` is a
+`threading.Event` set when the service stops (`systemctl stop`, Ctrl+C): return then - the service doesn't wait long
+for its threads. An exception is logged and ends the thread (it is not started again).
+```python
+from threading import Event
+
+from epiframe.service.frame import Frame
+
+
+def service_thread(self, frame: Frame, stop: Event) -> None:
+    while not stop.wait(60):  # every minute until the service stops
+        self.logger.info(f"Next photo {frame.next_update_text()}")
+```
+
+**_🚧 Being redesigned 🚧_** `add_website` will change together with the new WebUI of ePiframe 2.0. Until then it
+keeps its ePiframe 1.x form (`web_manager` is ePiframe's `epiframe.web.app.WebUI`, `users` its users store,
+`backend` the frame). The [tutorial](TUTORIAL.md) (step 6) shows a
 WebUI page that works with ePiframe 2.0 today.
 
 # Creating configuration
