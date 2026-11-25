@@ -169,7 +169,7 @@ library can have hundreds of thousands of photos) - sorting, filtering and picki
 * For optional extras (e.g. a price from a web API) catch the error, log it with `self.logger.warning(...)` and
   return: the photo is shown without the extra.
 * A plugin that can't be loaded (e.g. an import error, a 1.x plugin) is logged and skipped - the frame keeps working.
-* An invalid configuration value is reported by `./ePiframe.py --check-config` and in the WebUI.
+* An invalid configuration value is reported by `./ePiframe.py check-config` and in the WebUI.
 
 # Plugin methods
 
@@ -271,7 +271,7 @@ def fetch_photo(self, photo: Photo, directory: Path, name: str) -> Path:
 | Field                | Description                                                                                     |
 |----------------------|-------------------------------------------------------------------------------------------------|
 | `photo.path`         | `Path` of the photo file to edit in place                                                       |
-| `photo.photo`        | the `Photo` from the index, or `None` (`--test-convert` and `--convert` work on a given file)  |
+| `photo.photo`        | the `Photo` from the index, or `None` (the `test-convert` and `convert` commands work on a given file)  |
 | `photo.width`        | display width in pixels (`image_width` of ePiframe)                                             |
 | `photo.height`       | display height in pixels (`image_height` of ePiframe)                                           |
 | `photo.horizontal`   | `False` for a vertical frame                                                                    |
@@ -399,7 +399,7 @@ WebUI renders the settings from the same description. Two things are needed:
 
 Check the configuration (of ePiframe and all plugins) with:
 
-```./ePiframe.py --check-config```
+```./ePiframe.py check-config```
 
 ## Configuration entries
 
@@ -505,10 +505,10 @@ Test the plugin well before the release - it runs on someone's working frame.
 * Put the plugin into the `plugins` folder of a test ePiframe (stop the
   [service](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#service-control) of a working frame first)
   or point `EPIFRAME_PLUGINS_DIR` to a test folder.
-* `./ePiframe.py --check-config` checks the plugin configuration.
-* `./ePiframe.py --test` runs a whole photo change without the display (also on a non-Pi computer) - the log shows
+* `./ePiframe.py check-config` checks the plugin configuration.
+* `./ePiframe.py test` runs a whole photo change without the display (also on a non-Pi computer) - the log shows
   the plugin methods; the result is `photo.bmp`.
-* `./ePiframe.py --test-convert <photo>` runs the processing on a given file (`photo.photo` is `None`).
+* `./ePiframe.py test-convert <photo>` runs the processing on a given file (`photo.photo` is `None`).
 * More in the [ePiframe command line](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line).
 
 Remember that:
@@ -529,7 +529,7 @@ The plugin documentation should describe ([contribution](#contribution)):
 The basic steps are the same for all plugins:
 * Clone/download/extract the plugin to *<ePiframe_path>/plugins/<plugin_folder>* (letters, digits and `_` only)
 * Configure the plugin in *<plugin_folder>/config.cfg* or in the ePiframe WebUI under *Plugins - <plugin_name>*
-* Check the configuration in the WebUI or with `./ePiframe.py --check-config`
+* Check the configuration in the WebUI or with `./ePiframe.py check-config`
 
 ## Plugins execution order
 

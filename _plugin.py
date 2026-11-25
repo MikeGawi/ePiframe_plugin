@@ -95,7 +95,7 @@ class Plugin(PluginBase):
 
     # --------------------------------------------------------- photo processing
     # photo is a PhotoFile: photo.path (the file to edit in place), photo.photo
-    # (the Photo from the index, None for --test-convert/--convert runs),
+    # (the Photo from the index, None for the test-convert/convert commands),
     # photo.width / photo.height (display size), photo.horizontal and
     # photo.rotation (vertical frames store the photo turned), photo.image_magick
     # (ImageMagick runner: .run([...]), .size(file), .image_format(file)).

@@ -75,7 +75,7 @@ first, so you don't interfere with a working frame (or point the `EPIFRAME_PLUGI
 test plugins folder).
 
 ePiframe [can be installed](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#manual) also on non-Pi
-computers. Run it with the `--test` flag from the command line, i.e. `./ePiframe.py --test` - it makes a whole photo
+computers. Run it with the `test` command from the command line, i.e. `./ePiframe.py test` - it makes a whole photo
 change without the display and the log shows what the plugin did. Running the WebUI and other services is possible
 with [other commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line).
 
@@ -485,7 +485,7 @@ def postprocess_photo(self, photo: PhotoFile) -> None:
 
 * the method runs for every shown photo, but only photos of our source (`self.source`) get the watermark;
   `photo.photo` is `None` when a photo is converted from the
-  [command line](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line) (`--test-convert`)
+  [command line](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line) (`test-convert`)
 * the photo is read, turned upright and converted to RGBA; its original mode is kept in `mode`
 * `self.path` is the plugin folder: the watermark is a file of the plugin, converted to RGBA too and resized to 1/10
   of the photo width and height
@@ -855,7 +855,7 @@ The WebUI renders the settings from their description. Two things are needed:
 
 The plugin configuration is checked the same way as ePiframe's own:
 
-```./ePiframe.py --check-config```
+```./ePiframe.py check-config```
 
 The entries are already in our `settings()` method:
 ```python
@@ -994,7 +994,7 @@ With the whole plugin implemented we should test it very deeply. During tests, r
 With these hints you can plan test scenarios and make sure that the plugin works fine in every situation.
 
 The ePiframe [command line](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line) helps to test
-every part: `--check-config` (configuration), `--test` (a whole photo change without the display), `--test-convert`
+every part: `check-config` (configuration), `test` (a whole photo change without the display), `test-convert`
 (processing of a given photo).
 
 ### Documentation and licensing
@@ -1008,7 +1008,7 @@ From the [ePiframe_plugin documentation](https://github.com/MikeGawi/ePiframe_pl
 The basic steps are the same for all plugins:
 * Clone/download/extract the plugin to _<ePiframe_path>/plugins/<plugin_folder>_ (letters, digits and `_` only)
 * Configure the plugin in _<plugin_folder>/config.cfg_ or in the ePiframe WebUI under _Plugins - <plugin_name>_
-* Check the configuration in the WebUI or with `./ePiframe.py --check-config`
+* Check the configuration in the WebUI or with `./ePiframe.py check-config`
 
 Check the [plugin examples](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#examples) for
 reference.
