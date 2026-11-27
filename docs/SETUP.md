@@ -25,6 +25,7 @@ with ePiframe 2.0 - see [Migrating a 1.x plugin](#migrating-a-1x-plugin).
       * [Renamed entries](#renamed-entries)
    * [Testing](#testing)
    * [Plugin installation](#plugin-installation)
+      * [Python packages](#python-packages)
       * [Plugins execution order](#plugins-execution-order)
    * [Migrating a 1.x plugin](#migrating-a-1x-plugin)
    * [Examples](#examples)
@@ -39,6 +40,8 @@ Please follow these rules if you want to create your own plugin:
 * Add a short, one sentence, clear description what it does and put this data in the plugin class as well
 * Add what external APIs/sites/modules/projects it uses and if they have limitations or price
 * Include a detailed installation instruction, what needs to be installed and configured
+* List the Python packages the plugin needs (other than ePiframe's own) in *requirements.txt* in the plugin folder
+  ([Python packages](#python-packages))
 * Add plugin details in [this table](https://github.com/MikeGawi/ePiframe_plugin#plugins-list) and create a pull request
 
 ## Additional hints
@@ -94,6 +97,7 @@ plugins
 └── plugin_name
     ├── _plugin.py
     ├── config.cfg
+    ├── requirements.txt   (optional)
     └── default
         └── config.default
 ```
@@ -101,11 +105,12 @@ plugins
 The `plugins` folder is in the ePiframe folder (or where the `EPIFRAME_PLUGINS_DIR` environment variable points).
 *plugin_name* is the plugin folder: letters, digits and `_` only.
 
-| File             | Description                                                     |
-|------------------|-----------------------------------------------------------------|
-| *_plugin.py*     | the plugin: `class Plugin(epiframe.plugins.base.Plugin)`        |
-| *config.cfg*     | plugin configuration (changed by the user)                      |
-| *config.default* | default configuration, used to restore and validate the entries |
+| File               | Description                                                                      |
+|--------------------|----------------------------------------------------------------------------------|
+| *_plugin.py*       | the plugin: `class Plugin(epiframe.plugins.base.Plugin)`                         |
+| *config.cfg*       | plugin configuration (changed by the user)                                       |
+| *config.default*   | default configuration, used to restore and validate the entries                  |
+| *requirements.txt* | optional: Python packages the plugin needs ([Python packages](#python-packages)) |
 
 Initially *config.cfg* and *config.default* should be the same. A plugin can have more files (modules, fonts,
 images, templates...) - `self.path` is its folder.
@@ -169,7 +174,7 @@ library can have hundreds of thousands of photos) - sorting, filtering and picki
 * For optional extras (e.g. a price from a web API) catch the error, log it with `self.logger.warning(...)` and
   return: the photo is shown without the extra.
 * A plugin that can't be loaded (e.g. an import error, a 1.x plugin) is logged and skipped - the frame keeps working.
-* An invalid configuration value is reported by `./ePiframe.py check-config` and in the WebUI.
+* An invalid configuration value is reported by `epiframe check-config` and in the WebUI.
 
 # Plugin methods
 
@@ -399,7 +404,7 @@ WebUI renders the settings from the same description. Two things are needed:
 
 Check the configuration (of ePiframe and all plugins) with:
 
-```./ePiframe.py check-config```
+```epiframe check-config```
 
 ## Configuration entries
 
@@ -505,10 +510,10 @@ Test the plugin well before the release - it runs on someone's working frame.
 * Put the plugin into the `plugins` folder of a test ePiframe (stop the
   [service](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#service-control) of a working frame first)
   or point `EPIFRAME_PLUGINS_DIR` to a test folder.
-* `./ePiframe.py check-config` checks the plugin configuration.
-* `./ePiframe.py test` runs a whole photo change without the display (also on a non-Pi computer) - the log shows
+* `epiframe check-config` checks the plugin configuration.
+* `epiframe test` runs a whole photo change without the display (also on a non-Pi computer) - the log shows
   the plugin methods; the result is `photo.bmp`.
-* `./ePiframe.py test-convert <photo>` runs the processing on a given file (`photo.photo` is `None`).
+* `epiframe test-convert <photo>` runs the processing on a given file (`photo.photo` is `None`).
 * More in the [ePiframe command line](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line).
 
 Remember that:
@@ -528,8 +533,34 @@ The plugin documentation should describe ([contribution](#contribution)):
 
 The basic steps are the same for all plugins:
 * Clone/download/extract the plugin to *<ePiframe_path>/plugins/<plugin_folder>* (letters, digits and `_` only)
+* If the plugin has a *requirements.txt*: install its Python packages with `sudo ./install.sh --plugins` in the
+  ePiframe folder ([Python packages](#python-packages))
 * Configure the plugin in *<plugin_folder>/config.cfg* or in the ePiframe WebUI under *Plugins - <plugin_name>*
-* Check the configuration in the WebUI or with `./ePiframe.py check-config`
+* Check the configuration in the WebUI or with `epiframe check-config`
+
+## Python packages
+
+ePiframe runs in its own Python environment (a virtual environment in *<ePiframe_path>/.venv*), so packages
+installed with `sudo pip3 install` (1.x instructions) are not visible to it, and Raspberry Pi OS blocks system wide
+pip installs anyway. A plugin that needs Python packages lists them in *requirements.txt* in its folder (pip
+format, one package per line):
+
+```
+qrcode>=7.4
+```
+
+* Leave out what ePiframe already has: Pillow, requests, Flask, numpy, ...
+  (see [*pyproject.toml*](https://github.com/MikeGawi/ePiframe/blob/v2/pyproject.toml)).
+* Don't pin exact versions: the packages are installed within the versions ePiframe uses (its *uv.lock*). A
+  requirement that conflicts with them is refused and nothing is installed (the error says why).
+* Prefer pure Python packages or packages with wheels for the Raspberry Pi: on 32-bit Raspberry Pi OS (Pi Zero)
+  the installer also uses [piwheels](https://www.piwheels.org/), anything else is built on the Pi (slow, needs a
+  compiler).
+
+The user installs them with `sudo ./install.sh --plugins` in the ePiframe folder after adding the plugin, then
+restarts the service (`sudo systemctl restart ePiframe`). `./install.sh --update` installs them again (the update
+rebuilds the Python environment). A plugin whose packages are missing is skipped with an error in the log. System
+programs (`apt` packages) are not covered: describe them in the plugin documentation.
 
 ## Plugins execution order
 

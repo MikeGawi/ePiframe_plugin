@@ -61,6 +61,9 @@ related things.
 If your plugin needs more, i.e. external APIs, sites, modules, projects - describe in the documentation how to
 install/configure them and whether they have limitations or a price.
 
+Python packages that ePiframe doesn't have go to *requirements.txt* in the plugin folder - the user installs them
+with `sudo ./install.sh --plugins` (see [Python packages](SETUP.md#python-packages)). ePiSync needs none.
+
 Let's install rsync:
 ```
 sudo apt update
@@ -75,7 +78,7 @@ first, so you don't interfere with a working frame (or point the `EPIFRAME_PLUGI
 test plugins folder).
 
 ePiframe [can be installed](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#manual) also on non-Pi
-computers. Run it with the `test` command from the command line, i.e. `./ePiframe.py test` - it makes a whole photo
+computers. Run it with the `test` command from the command line, i.e. `epiframe test` - it makes a whole photo
 change without the display and the log shows what the plugin did. Running the WebUI and other services is possible
 with [other commands](https://github.com/MikeGawi/ePiframe/blob/master/INSTALL.md#command-line).
 
@@ -855,7 +858,7 @@ The WebUI renders the settings from their description. Two things are needed:
 
 The plugin configuration is checked the same way as ePiframe's own:
 
-```./ePiframe.py check-config```
+```epiframe check-config```
 
 The entries are already in our `settings()` method:
 ```python
@@ -1008,7 +1011,7 @@ From the [ePiframe_plugin documentation](https://github.com/MikeGawi/ePiframe_pl
 The basic steps are the same for all plugins:
 * Clone/download/extract the plugin to _<ePiframe_path>/plugins/<plugin_folder>_ (letters, digits and `_` only)
 * Configure the plugin in _<plugin_folder>/config.cfg_ or in the ePiframe WebUI under _Plugins - <plugin_name>_
-* Check the configuration in the WebUI or with `./ePiframe.py check-config`
+* Check the configuration in the WebUI or with `epiframe check-config`
 
 Check the [plugin examples](https://github.com/MikeGawi/ePiframe_plugin/blob/master/docs/SETUP.md#examples) for
 reference.
